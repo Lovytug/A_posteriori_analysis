@@ -1,20 +1,35 @@
+#pragma once
 #include "Transport.h"
+
 #include <memory>
 
-class Waves : public Noise
+namespace apa
 {
-	
-};
+	class Waves : public Noise
+	{
+	public:
+		Waves(const Vector& meanVelocity, const Matrix& covMatrix);
 
-class Ship : public Transport
-{
-public:
-	Ship();
+	protected:
+		Vector getTrueVelocity() override;
 
-protected:
-	void move() override;
+	private:
+		std::shared_ptr<RandomnessGenerator> fluctation;
+		Vector meanVelocity;
+		Matrix covMatrix;
+	};
 
-private:
-	Waves wave;
+	class Ship : public Transport
+	{
+	public:
+		Ship(const Vector& vecPos, std::shared_ptr<Noise> wave);
 
-};
+	protected:
+		void move() override;
+		Vector getVectorState() override;
+
+	private:
+		std::shared_ptr<Noise> wave;
+		Vector radiusVector;
+	};
+}
