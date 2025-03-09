@@ -4,7 +4,6 @@
 #include <memory>
 
 using Trans_ptr = std::shared_ptr<apa::Transport>;
-using Sensor_ptr = std::shared_ptr<apa::SensorNoise>;
 
 namespace apa
 {
@@ -12,6 +11,7 @@ namespace apa
 	{
 	public:
 		SensorNoise();
+		Vector getSensorNoise();
 
 	protected:
 		std::shared_ptr<RandomnessGenerator> noiseSensor;
@@ -28,9 +28,10 @@ namespace apa
 		Vector getVectorDelta_awesomeState(); //KF
 
 	private:
-		Sensor_ptr noise;
 		Trans_ptr me;
 		Trans_ptr target;
+		std::shared_ptr<KalmanFilter> KF;
+		std::shared_ptr<SensorNoise> noise;
 		Vector noiseDelta_position;
 		Vector noiseDelta_velocityFluct;
 
@@ -38,7 +39,8 @@ namespace apa
 		Vector getMeVectorState();
 		Vector getTargetVectorState();
 
-		void getDataInNoiseForm();
+		void makeNoiseWithReceivedData();
+		Vector getVectorNoiseDelta_state();
 		Vector transformVectorStateInVecDelta_position();
 		Vector transformVectorStateInVecDelta_velocityFluct();
 
