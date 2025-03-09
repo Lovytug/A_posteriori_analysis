@@ -1,6 +1,21 @@
 #pragma once
+#include <Eigen/Dense>
+#include <random>
 
-class RandomnessGenerator
+namespace apa
 {
+	class RandomnessGenerator
+	{
+	public:
+		RandomnessGenerator(const Eigen::VectorXd& mean, const Eigen::MatrixXd& cov);
+		Eigen::VectorXd getVectorRejection();
 
-};
+	private:
+		std::mt19937 generator;
+		std::normal_distribution<> dist;
+		Eigen::VectorXd fluctation;
+		Eigen::VectorXd mean;
+		Eigen::MatrixXd cov;
+
+	};
+}

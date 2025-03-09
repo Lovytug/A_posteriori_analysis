@@ -11,7 +11,7 @@ apa::Wind::Wind(const Vector& mean, const Matrix& cov)
 
 Vector apa::Wind::getTrueVelocity()
 {
-	return meanVelocity; // plus vector fluctation
+	return meanVelocity + fluctation->getVectorRejection(); // plus vector fluctation
 }
 
 

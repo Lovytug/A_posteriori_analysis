@@ -5,6 +5,7 @@ set(SRC_FILE
 	src/Locator.cpp 
 	src/KalmanFilter.cpp
 	src/AimingSystem.cpp
+	src/RandomnessGenerator.cpp
 )
 
 add_library(MyLib STATIC ${SRC_FILE})

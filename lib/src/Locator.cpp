@@ -14,7 +14,7 @@ apa::SensorNoise::SensorNoise()
 
 Vector apa::SensorNoise::getSensorNoise()
 {
-
+	return noiseSensor->getVectorRejection();
 }
 
 
