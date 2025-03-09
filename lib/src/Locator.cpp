@@ -3,7 +3,7 @@
 apa::SensorNoise::SensorNoise()
 {
 	vectorMean(2);
-	matrixCov(4);
+	matrixCov(2, 2);
 
 	vectorMean << 0.0, 0.0;
 	matrixCov << 10.0, 0.0,
@@ -41,12 +41,15 @@ void apa::Locator::makeNoiseWithReceivedData()
 	noiseDelta_velocityFluct = vecotrDelta_state.segment(2, 2);
 }
 
-
+Vector apa::Locator::getVectorDelta_awesomeState()
+{
+	return KF->getVectorDelta_awesomeState();
+}
 
 Vector apa::Locator::getVectorDelta_state()
 {
 	Vector vec(4);
-	vec << getMeVectorState() - getTargetVectorState();
+	vec << getTargetVectorState() - getMeVectorState();
 	return vec;
 }
 	

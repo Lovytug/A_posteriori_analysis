@@ -2,6 +2,7 @@
 #include "Transport.h"
 
 #include "Locator.h"
+#include "AimingSystem.h"
 #include <memory>
 
 using Trans_ptr = std::shared_ptr<apa::Transport>;
@@ -23,7 +24,7 @@ namespace apa
 		Matrix covMatrix;
 	};
 
-	class Helicopter : Transport
+	class Helicopter : public Transport, public std::enable_shared_from_this<Helicopter>
 	{
 	public:
 		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const Trans_ptr& target);

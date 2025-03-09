@@ -3,7 +3,7 @@
 apa::Waves::Waves(const Vector& mean, const Matrix& cov)
 {
 	meanVelocity(2);
-	covMatrix(4);
+	covMatrix(2, 2);
 	meanVelocity = mean;
 	covMatrix = cov;
 	fluctation = std::make_shared<RandomnessGenerator>(meanVelocity, covMatrix);
