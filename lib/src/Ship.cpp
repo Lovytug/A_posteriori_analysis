@@ -1,7 +1,11 @@
 #include "Ship.h"
 
-apa::Waves::Waves(const Vector& mean, const Matrix& cov) : meanVelocity(mean), covMatrix(cov)
+apa::Waves::Waves(const Vector& mean, const Matrix& cov)
 {
+	meanVelocity(2);
+	covMatrix(4);
+	meanVelocity = mean;
+	covMatrix = cov;
 	fluctation = std::make_shared<RandomnessGenerator>(meanVelocity, covMatrix);
 }
 
@@ -11,7 +15,7 @@ Vector apa::Waves::getTrueVelocity()
 }
 
 
-apa::Ship::Ship(const Vector& vecPos, std::shared_ptr<Noise> wave) : radiusVector(vecPos)
+apa::Ship::Ship(const Vector& vecPos, const NatDist_ptr& wave) : radiusVector(vecPos)
 {
 	this->wave = wave;
 }
@@ -19,6 +23,8 @@ apa::Ship::Ship(const Vector& vecPos, std::shared_ptr<Noise> wave) : radiusVecto
 void apa::Ship::move()
 {
 	Vector next_radiusVector = radiusVector + wave->getTrueVelocity();
+	
+	radiusVector = next_radiusVector;
 }
 
 Vector apa::Ship::getVectorState()

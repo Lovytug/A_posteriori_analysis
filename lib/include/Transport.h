@@ -7,10 +7,10 @@ using Vector = Eigen::VectorXd;
 
 namespace apa
 {
-	class Noise
+	class NaturalDisturbances
 	{
 	public:
-		Noise() = default;
+		NaturalDisturbances() = default;
 		virtual Vector getTrueVelocity() = 0;
 
 	};

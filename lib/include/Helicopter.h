@@ -1,11 +1,15 @@
 #pragma once
 #include "Transport.h"
 
+#include "Locator.h"
 #include <memory>
+
+using Trans_ptr = std::shared_ptr<apa::Transport>;
+using NatDist_ptr = std::shared_ptr<apa::NaturalDisturbances>;
 
 namespace apa
 {
-	class Wind : Noise
+	class Wind : NaturalDisturbances
 	{
 	public:
 		Wind(const Vector& meanVelocity, const Matrix& covMatrix);
@@ -22,14 +26,14 @@ namespace apa
 	class Helicopter : Transport
 	{
 	public:
-		Helicopter(const Vector& vecPos, std::shared_ptr<Noise> wind, std::shared_ptr<Transport> target);
+		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const Trans_ptr& target);
 
 	protected:
 		void move() override;
 		Vector getVectorState() override;
 
 	private:
-		std::shared_ptr<Noise> wind;
+		NatDist_ptr wind;
 		std::shared_ptr<Locator> locator;
 		std::shared_ptr<AimingSystem> AS;
 		Vector radiusVector;

@@ -3,9 +3,11 @@
 
 #include <memory>
 
+using NatDist_ptr = std::shared_ptr<apa::NaturalDisturbances>;
+
 namespace apa
 {
-	class Waves : public Noise
+	class Waves : public NaturalDisturbances
 	{
 	public:
 		Waves(const Vector& meanVelocity, const Matrix& covMatrix);
@@ -22,14 +24,14 @@ namespace apa
 	class Ship : public Transport
 	{
 	public:
-		Ship(const Vector& vecPos, std::shared_ptr<Noise> wave);
+		Ship(const Vector& vecPos, const NatDist_ptr& wave);
 
 	protected:
 		void move() override;
 		Vector getVectorState() override;
 
 	private:
-		std::shared_ptr<Noise> wave;
+		NatDist_ptr wave;
 		Vector radiusVector;
 	};
 }
