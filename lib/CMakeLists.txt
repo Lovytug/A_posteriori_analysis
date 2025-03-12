@@ -6,6 +6,7 @@ set(SRC_FILE
 	src/KalmanFilter.cpp
 	src/AimingSystem.cpp
 	src/RandomnessGenerator.cpp
+	src/OnBoardSystem.cpp
 )
 
 add_library(MyLib STATIC ${SRC_FILE})

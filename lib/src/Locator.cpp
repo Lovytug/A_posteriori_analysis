@@ -18,34 +18,32 @@ Vector apa::SensorNoise::getSensorNoise()
 }
 
 
-apa::Locator::Locator(Trans_ptr& hunter, Trans_ptr& target) : me(hunter), target(target)
+apa::Locator::Locator(Trans_ptr& hunter, Trans_ptr& target, Kalman_ptr& KF) : me(hunter), target(target), KF(KF)
 {
 	noiseDelta_position.resize(2);
 	noiseDelta_velocityFluct.resize(2);
 
-	KF = std::make_shared<KalmanFilter>(getVectorDelta_state());
 	noise = std::make_shared<SensorNoise>();
 }
 
-void apa::Locator::location()
+void apa::Locator::location(const Vector& vecAimVel)
 {
-	makeNoiseWithReceivedData();
-	KF->perfomFiltring(getVectorNoiseDelta_state());
+	writeRealDataFromObject();
+	KF->perfomFiltring(getVisibleVector(), vecAimVel);
 }
 
-void apa::Locator::makeNoiseWithReceivedData()
+void apa::Locator::writeRealDataFromObject()
 {
-	Vector vecotrDelta_state = getVectorDelta_state();
+	Vector vectorDelta_state = getVectorDelta_state();
 
-	noiseDelta_position = vecotrDelta_state.segment(0, 2) + noise->getSensorNoise(); // возращать шумы
-	noiseDelta_velocityFluct = vecotrDelta_state.segment(2, 2);
+	noiseDelta_position = vectorDelta_state.segment(0, 2) + noise->getSensorNoise(); // возращать шумы
+	noiseDelta_velocityFluct = vectorDelta_state.segment(2, 2);
 }
 
-Vector apa::Locator::getVectorNoiseDelta_state()
+Vector apa::Locator::getVisibleVector()
 {
-	Vector result(4);
-	result = noiseDelta_position.segment(0, 2);
-	result = noiseDelta_velocityFluct.segment(2, 2);
+	Vector result(2);
+	result = noiseDelta_position;
 
 	return result;
 }

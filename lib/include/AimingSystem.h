@@ -10,6 +10,7 @@ namespace apa
 	{
 	public:
 		AimingSystem();
+		Vector getVectorVelocityAiming();
 		Vector getVectorVelocityAiming(const Vector& vectorState);
 
 	private:

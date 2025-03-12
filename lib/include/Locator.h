@@ -4,6 +4,7 @@
 #include <memory>
 
 using Trans_ptr = std::shared_ptr<apa::Transport>;
+using Kalman_ptr = std::shared_ptr<apa::KalmanFilter>;
 
 namespace apa
 {
@@ -22,15 +23,15 @@ namespace apa
 	class Locator
 	{
 	public:
-		Locator(Trans_ptr& hunter, Trans_ptr& target);
-		void location();
+		Locator(Trans_ptr& hunter, Trans_ptr& target, Kalman_ptr& KF);
+		void location(const Vector& vec);
 		Vector getVectorDelta_state();
 		Vector getVectorDelta_awesomeState(); //KF
 
 	private:
 		Trans_ptr& me;
 		Trans_ptr& target;
-		std::shared_ptr<KalmanFilter> KF;
+		Kalman_ptr& KF;
 		std::shared_ptr<SensorNoise> noise;
 		Vector noiseDelta_position;
 		Vector noiseDelta_velocityFluct;
@@ -39,8 +40,8 @@ namespace apa
 		Vector getMeVectorState();
 		Vector getTargetVectorState();
 
-		void makeNoiseWithReceivedData();
-		Vector getVectorNoiseDelta_state();
+		void writeRealDataFromObject();
+		Vector getVisibleVector();
 
 	};
 }

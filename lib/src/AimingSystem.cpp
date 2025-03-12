@@ -3,6 +3,12 @@
 apa::AimingSystem::AimingSystem()
 {
 	vectorVelocityAiming.resize(2);
+	vectorVelocityAiming.setZero();
+}
+
+Vector apa::AimingSystem::getVectorVelocityAiming()
+{
+	return vectorVelocityAiming;
 }
 
 Vector apa::AimingSystem::getVectorVelocityAiming(const Vector& vectorState)

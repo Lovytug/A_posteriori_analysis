@@ -1,8 +1,8 @@
 #pragma once
 #include "Transport.h"
-
 #include "Locator.h"
 #include "AimingSystem.h"
+#include "OnBoardSystem.h"
 #include <memory>
 
 using Trans_ptr = std::shared_ptr<apa::Transport>;
@@ -27,7 +27,7 @@ namespace apa
 	class Helicopter : public Transport
 	{
 	public:
-		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const std::shared_ptr<Locator>& loc);
+		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const std::shared_ptr<OnBoardSystem>& obs);
 
 	protected:
 		void move() override;
@@ -37,6 +37,7 @@ namespace apa
 		NatDist_ptr wind;
 		std::shared_ptr<Locator> locator;
 		std::shared_ptr<AimingSystem> AS;
+		std::shared_ptr<OnBoardSystem> OBS;
 		Vector radiusVector;
 	};
 }

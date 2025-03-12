@@ -16,18 +16,22 @@ Vector apa::Wind::getTrueVelocity()
 
 
 
-apa::Helicopter::Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const std::shared_ptr<Locator>& loc) : radiusVector(vecPos)
+apa::Helicopter::Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const std::shared_ptr<OnBoardSystem>& obs) : radiusVector(vecPos)
 {
 	this->wind = wind;
-	AS = std::make_shared<AimingSystem>();
-	locator = loc;
+	OBS = obs;
 }
 
 void apa::Helicopter::move()
 {
-	locator->location();
+	auto locator = OBS->getLocator();
+	auto AS = OBS->getAimingSystem();
+	locator->location(AS->getVectorVelocityAiming());
+
 	Vector vectorVelosityHeli = AS->getVectorVelocityAiming(locator->getVectorDelta_awesomeState());
 	Vector next_radiusVector = radiusVector + (vectorVelosityHeli + wind->getTrueVelocity());
+
+	radiusVector = next_radiusVector;
 }
 
 Vector apa::Helicopter::getVectorState()
