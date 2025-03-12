@@ -14,3 +14,4 @@ FetchContent_MakeAvailable(eigen)
 
 
 add_subdirectory(lib)
+add_subdirectory(view)

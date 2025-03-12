@@ -22,14 +22,14 @@ namespace apa
 	class Locator
 	{
 	public:
-		Locator(const Trans_ptr& hunter, const Trans_ptr& target);
+		Locator(Trans_ptr& hunter, Trans_ptr& target);
 		void location();
 		Vector getVectorDelta_state();
 		Vector getVectorDelta_awesomeState(); //KF
 
 	private:
-		Trans_ptr me;
-		Trans_ptr target;
+		Trans_ptr& me;
+		Trans_ptr& target;
 		std::shared_ptr<KalmanFilter> KF;
 		std::shared_ptr<SensorNoise> noise;
 		Vector noiseDelta_position;
@@ -41,8 +41,6 @@ namespace apa
 
 		void makeNoiseWithReceivedData();
 		Vector getVectorNoiseDelta_state();
-		Vector transformVectorStateInVecDelta_position();
-		Vector transformVectorStateInVecDelta_velocityFluct();
 
 	};
 }

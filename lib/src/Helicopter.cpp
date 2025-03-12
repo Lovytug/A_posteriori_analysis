@@ -2,8 +2,8 @@
 
 apa::Wind::Wind(const Vector& mean, const Matrix& cov)
 {
-	meanVelocity(2);
-	covMatrix(2, 2);
+	meanVelocity.resize(2);
+	covMatrix.resize(2, 2);
 	meanVelocity = mean;
 	covMatrix = cov;
 	fluctation = std::make_shared<RandomnessGenerator>(meanVelocity, covMatrix);
@@ -15,11 +15,12 @@ Vector apa::Wind::getTrueVelocity()
 }
 
 
-apa::Helicopter::Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const Trans_ptr& target) : radiusVector(vecPos)
+
+apa::Helicopter::Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const std::shared_ptr<Locator>& loc) : radiusVector(vecPos)
 {
 	this->wind = wind;
-	locator = std::make_shared<Locator>(shared_from_this(), target);
 	AS = std::make_shared<AimingSystem>();
+	locator = loc;
 }
 
 void apa::Helicopter::move()

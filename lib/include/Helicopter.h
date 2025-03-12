@@ -10,7 +10,7 @@ using NatDist_ptr = std::shared_ptr<apa::NaturalDisturbances>;
 
 namespace apa
 {
-	class Wind : NaturalDisturbances
+	class Wind : public NaturalDisturbances
 	{
 	public:
 		Wind(const Vector& meanVelocity, const Matrix& covMatrix);
@@ -24,10 +24,10 @@ namespace apa
 		Matrix covMatrix;
 	};
 
-	class Helicopter : public Transport, public std::enable_shared_from_this<Helicopter>
+	class Helicopter : public Transport
 	{
 	public:
-		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const Trans_ptr& target);
+		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const std::shared_ptr<Locator>& loc);
 
 	protected:
 		void move() override;
