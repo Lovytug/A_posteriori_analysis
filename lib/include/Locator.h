@@ -12,7 +12,7 @@ namespace apa
 	{
 	public:
 		SensorNoise();
-		Vector getSensorNoise();
+		Vector getSensorNoise(const double& time);
 
 	protected:
 		std::shared_ptr<RandomnessGenerator> noiseSensor;
@@ -23,24 +23,24 @@ namespace apa
 	class Locator
 	{
 	public:
-		Locator(Trans_ptr& hunter, Trans_ptr& target, Kalman_ptr& KF);
-		void location(const Vector& vec);
-		Vector getVectorDelta_state();
+		Locator(Trans_ptr& target, Trans_ptr& hunter, Kalman_ptr& KF);
+		void location(const Vector& vec, const double& time);
+		Vector getVectorDelta_state(const double& time);
 		Vector getVectorDelta_awesomeState(); //KF
 
 	private:
 		Trans_ptr& me;
 		Trans_ptr& target;
-		Kalman_ptr& KF;
+		Kalman_ptr KF;
 		std::shared_ptr<SensorNoise> noise;
 		Vector noiseDelta_position;
 		Vector noiseDelta_velocityFluct;
 
 		//also for getVectorDelta_state() 
-		Vector getMeVectorState();
-		Vector getTargetVectorState();
+		Vector getMeVectorState(const double& time);
+		Vector getTargetVectorState(const double& time);
 
-		void writeRealDataFromObject();
+		void writeRealDataFromObject(const double& time);
 		Vector getVisibleVector();
 
 	};

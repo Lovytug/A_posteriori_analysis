@@ -9,10 +9,11 @@ apa::Waves::Waves(const Vector& mean, const Matrix& cov)
 	fluctation = std::make_shared<RandomnessGenerator>(meanVelocity, covMatrix);
 }
 
-Vector apa::Waves::getTrueVelocity()
+Vector apa::Waves::getTrueVelocity(const double& time)
 {
-	return meanVelocity + fluctation->getVectorRejection(); // plus vector fluctation
+	return meanVelocity + fluctation->getVectorRejection(time); // plus vector fluctation
 }
+
 
 
 apa::Ship::Ship(const Vector& vecPos, const NatDist_ptr& wave) : radiusVector(vecPos)
@@ -20,17 +21,17 @@ apa::Ship::Ship(const Vector& vecPos, const NatDist_ptr& wave) : radiusVector(ve
 	this->wave = wave;
 }
 
-void apa::Ship::move()
+void apa::Ship::move(const double& time)
 {
-	Vector next_radiusVector = radiusVector + wave->getTrueVelocity();
+	Vector next_radiusVector = radiusVector + wave->getTrueVelocity(time);
 	
 	radiusVector = next_radiusVector;
 }
 
-Vector apa::Ship::getVectorState()
+Vector apa::Ship::getVectorState(const double& time)
 {
 	Vector vec(4);
 	vec.segment(0, 2) = radiusVector;
-	vec.segment(2, 2) = wave->getTrueVelocity();
+	vec.segment(2, 2) = wave->getTrueVelocity(time);
 	return vec;
 }

@@ -16,7 +16,7 @@ namespace apa
 		Wind(const Vector& meanVelocity, const Matrix& covMatrix);
 
 	protected:
-		Vector getTrueVelocity() override;
+		Vector getTrueVelocity(const double& time) override;
 
 	private:
 		std::shared_ptr<RandomnessGenerator> fluctation;
@@ -27,17 +27,15 @@ namespace apa
 	class Helicopter : public Transport
 	{
 	public:
-		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const std::shared_ptr<OnBoardSystem>& obs);
+		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, std::shared_ptr<OnBoardSystem>& obs);
 
 	protected:
-		void move() override;
-		Vector getVectorState() override;
+		void move(const double& time) override;
+		Vector getVectorState(const double& time) override;
 
 	private:
 		NatDist_ptr wind;
-		std::shared_ptr<Locator> locator;
-		std::shared_ptr<AimingSystem> AS;
-		std::shared_ptr<OnBoardSystem> OBS;
+		std::shared_ptr<OnBoardSystem>& OBS;
 		Vector radiusVector;
 	};
 }

@@ -11,7 +11,7 @@ namespace apa
 	{
 	public:
 		NaturalDisturbances() = default;
-		virtual Vector getTrueVelocity() = 0;
+		virtual Vector getTrueVelocity(const double& time) = 0;
 
 	};
 
@@ -19,7 +19,7 @@ namespace apa
 	{
 	public:
 		Transport() = default;
-		virtual void move() = 0;
-		virtual Vector getVectorState() = 0;
+		virtual void move(const double& currentTime) = 0;
+		virtual Vector getVectorState(const double& time) = 0;
 	};
 }

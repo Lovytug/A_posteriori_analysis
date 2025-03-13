@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "Transport.h"
 #include "Locator.h"
 #include "AimingSystem.h"
 
@@ -8,12 +9,12 @@ namespace apa
 	class OnBoardSystem
 	{
 	public:
-		OnBoardSystem(std::shared_ptr<Locator>& loc, std::shared_ptr<AimingSystem>& as);
+		OnBoardSystem(Trans_ptr& ship, Trans_ptr& heli, const Matrix& P);
 		std::shared_ptr<Locator> getLocator();
 		std::shared_ptr<AimingSystem> getAimingSystem();
 
 	private:
-		std::shared_ptr<Locator>& locator;
-		std::shared_ptr<AimingSystem>& AS;
+		std::shared_ptr<Locator> locator;
+		std::shared_ptr<AimingSystem> AS;
 	};
 }

@@ -12,13 +12,13 @@ apa::SensorNoise::SensorNoise()
 	noiseSensor = std::make_shared<RandomnessGenerator>(vectorMean, matrixCov);
 }
 
-Vector apa::SensorNoise::getSensorNoise()
+Vector apa::SensorNoise::getSensorNoise(const double& time)
 {
-	return noiseSensor->getVectorRejection();
+	return noiseSensor->getVectorRejection(time);
 }
 
 
-apa::Locator::Locator(Trans_ptr& hunter, Trans_ptr& target, Kalman_ptr& KF) : me(hunter), target(target), KF(KF)
+apa::Locator::Locator(Trans_ptr& target, Trans_ptr& hunter, Kalman_ptr& KF) : me(hunter), target(target), KF(KF)
 {
 	noiseDelta_position.resize(2);
 	noiseDelta_velocityFluct.resize(2);
@@ -26,17 +26,17 @@ apa::Locator::Locator(Trans_ptr& hunter, Trans_ptr& target, Kalman_ptr& KF) : me
 	noise = std::make_shared<SensorNoise>();
 }
 
-void apa::Locator::location(const Vector& vecAimVel)
+void apa::Locator::location(const Vector& vecAimVel, const double& time)
 {
-	writeRealDataFromObject();
+	writeRealDataFromObject(time);
 	KF->perfomFiltring(getVisibleVector(), vecAimVel);
 }
 
-void apa::Locator::writeRealDataFromObject()
+void apa::Locator::writeRealDataFromObject(const double& time)
 {
-	Vector vectorDelta_state = getVectorDelta_state();
+	Vector vectorDelta_state = getVectorDelta_state(time);
 
-	noiseDelta_position = vectorDelta_state.segment(0, 2) + noise->getSensorNoise(); // возращать шумы
+	noiseDelta_position = vectorDelta_state.segment(0, 2) + noise->getSensorNoise(time); // возращать шумы
 	noiseDelta_velocityFluct = vectorDelta_state.segment(2, 2);
 }
 
@@ -55,20 +55,22 @@ Vector apa::Locator::getVectorDelta_awesomeState()
 	return KF->getVectorDelta_awesomeState();
 }
 
-Vector apa::Locator::getMeVectorState()
+Vector apa::Locator::getMeVectorState(const double& time)
 {
-	return me->getVectorState();
+	return me->getVectorState(time);
 }
 
-Vector apa::Locator::getTargetVectorState()
+Vector apa::Locator::getTargetVectorState(const double& time)
 {
-	return target->getVectorState();
+	return target->getVectorState(time);
 }
 
-Vector apa::Locator::getVectorDelta_state()
+Vector apa::Locator::getVectorDelta_state(const double& time)
 {
 	Vector vec(4);
-	vec << getTargetVectorState() - getMeVectorState();
+	Vector vec2 = getTargetVectorState(time);
+	double r = vec2[0];
+	vec << getTargetVectorState(time) - getMeVectorState(time);
 	return vec;
 }
 	

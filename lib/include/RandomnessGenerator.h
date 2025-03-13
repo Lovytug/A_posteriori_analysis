@@ -8,7 +8,7 @@ namespace apa
 	{
 	public:
 		RandomnessGenerator(const Eigen::VectorXd& mean, const Eigen::MatrixXd& cov);
-		Eigen::VectorXd getVectorRejection();
+		Eigen::VectorXd getVectorRejection(const double& seed);
 
 	private:
 		std::mt19937 generator;

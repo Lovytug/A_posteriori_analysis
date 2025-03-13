@@ -14,9 +14,9 @@ Vector apa::AimingSystem::getVectorVelocityAiming()
 Vector apa::AimingSystem::getVectorVelocityAiming(const Vector& vectorState)
 {
 	Vector vecDelta_awePos = vectorState.segment(0, 2);
-	Vector vecDelta_aweVel = vectorState.segment(0, 2);
+	Vector vecDelta_aweVel = vectorState.segment(2, 2);
 
-	Vector result = vecDelta_awePos / 2.0 + vecDelta_aweVel;
+	Vector result = vecDelta_awePos * .5 + vecDelta_aweVel;
 
 	if (!(getModuleVectorVelocity(result) <= maxModuleVelocity))
 		vectorVelocityAiming = normalize(result);

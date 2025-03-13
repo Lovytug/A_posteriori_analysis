@@ -9,35 +9,32 @@ apa::Wind::Wind(const Vector& mean, const Matrix& cov)
 	fluctation = std::make_shared<RandomnessGenerator>(meanVelocity, covMatrix);
 }
 
-Vector apa::Wind::getTrueVelocity()
+Vector apa::Wind::getTrueVelocity(const double& time)
 {
-	return meanVelocity + fluctation->getVectorRejection(); // plus vector fluctation
+	return meanVelocity + fluctation->getVectorRejection(time); // plus vector fluctation
 }
 
 
 
-apa::Helicopter::Helicopter(const Vector& vecPos, const NatDist_ptr& wind, const std::shared_ptr<OnBoardSystem>& obs) : radiusVector(vecPos)
-{
-	this->wind = wind;
-	OBS = obs;
-}
+apa::Helicopter::Helicopter(const Vector& vecPos, const NatDist_ptr& wind, std::shared_ptr<OnBoardSystem>& obs) : 
+	radiusVector(vecPos), wind(wind), OBS(obs) {}
 
-void apa::Helicopter::move()
+void apa::Helicopter::move(const double& time)
 {
 	auto locator = OBS->getLocator();
 	auto AS = OBS->getAimingSystem();
-	locator->location(AS->getVectorVelocityAiming());
+	locator->location(AS->getVectorVelocityAiming(), time);
 
 	Vector vectorVelosityHeli = AS->getVectorVelocityAiming(locator->getVectorDelta_awesomeState());
-	Vector next_radiusVector = radiusVector + (vectorVelosityHeli + wind->getTrueVelocity());
+	Vector next_radiusVector = radiusVector + (vectorVelosityHeli + wind->getTrueVelocity(time));
 
 	radiusVector = next_radiusVector;
 }
 
-Vector apa::Helicopter::getVectorState()
+Vector apa::Helicopter::getVectorState(const double& time)
 {
 	Vector vec(4);
 	vec.segment(0, 2) = radiusVector;
-	vec.segment(2, 2) = wind->getTrueVelocity();
+	vec.segment(2, 2) = wind->getTrueVelocity(time);
 	return vec;
 }

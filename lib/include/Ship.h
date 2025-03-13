@@ -13,7 +13,7 @@ namespace apa
 		Waves(const Vector& meanVelocity, const Matrix& covMatrix);
 
 	protected:
-		Vector getTrueVelocity() override;
+		Vector getTrueVelocity(const double& time) override;
 
 	private:
 		std::shared_ptr<RandomnessGenerator> fluctation;
@@ -27,8 +27,8 @@ namespace apa
 		Ship(const Vector& vecPos, const NatDist_ptr& wave);
 
 	protected:
-		void move() override;
-		Vector getVectorState() override;
+		void move(const double& time) override;
+		Vector getVectorState(const double& time) override;
 
 	private:
 		NatDist_ptr wave;

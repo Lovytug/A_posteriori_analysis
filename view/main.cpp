@@ -21,29 +21,27 @@ void main()
 	NatDist_ptr wave = std::make_shared<apa::Waves>(mean_wave, cov_wave);
 	NatDist_ptr wind = std::make_shared<apa::Wind>(mean_wind, cov_wind);
 
-
-
 	Vector pos1(2);
 	pos1 << 1000, 1000;
 	Vector pos2(2);
 	pos2 << -1000, -1000;
 
 	Matrix P(4, 4);
-	P << 10, 0, 0, 0,
-		0, 10, 0, 0,
-		0, 0, 10, 0,
-		0, 0, 0, 10;
+	P << 0.1, 0, 0, 0,
+		0, 0.1, 0, 0,
+		0, 0, 0.01, 0,
+		0, 0, 0, 0.01;
 
-	Trans_ptr ship;
-	Trans_ptr heli;
+	std::shared_ptr<apa::OnBoardSystem> OBS;
+	Trans_ptr ship = std::make_shared<apa::Ship>(pos1, wave);
+	Trans_ptr heli = std::make_shared<apa::Helicopter>(pos2, wind, OBS);
 
-	Kalman_ptr KF;
-	std::shared_ptr<apa::Locator> locator = std::make_shared<apa::Locator>(heli, ship, KF);
-	std::shared_ptr<apa::AimingSystem> AS = std::make_shared<apa::AimingSystem>();
-	std::shared_ptr<apa::OnBoardSystem> OBS = std::make_shared<apa::OnBoardSystem>(locator, AS);
+	OBS = std::make_shared<apa::OnBoardSystem>(ship, heli, P);
 
-	ship = std::make_shared<apa::Ship>(pos1, wave);
-	heli = std::make_shared<apa::Helicopter>(pos2, wind, OBS);
+	double allTime = 1000;
+	std::shared_ptr<apa::MonitoringComplex> monitor = std::make_shared<apa::MonitoringComplex>(ship, heli, OBS, allTime);
 
-	KF = std::make_shared<apa::KalmanFilter>(ship, heli, P);
+
+	monitor->trackMovementOfGoals();
+
 }

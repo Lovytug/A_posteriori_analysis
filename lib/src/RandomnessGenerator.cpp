@@ -10,13 +10,14 @@ apa::RandomnessGenerator::RandomnessGenerator(const Eigen::VectorXd& mean, const
 	this->cov = cov;
 }
 
-Eigen::VectorXd apa::RandomnessGenerator::getVectorRejection()
+Eigen::VectorXd apa::RandomnessGenerator::getVectorRejection(const double& seed)
 {
-	generator.seed();
+	generator.seed(seed);
 
 	Eigen::VectorXd result(mean.size());
 	for (size_t i = 0; i < result.size(); i++)
 		result[i] = dist(generator);
 
+	fluctation = result;
 	return result;
 }
