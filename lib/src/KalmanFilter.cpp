@@ -88,3 +88,20 @@ Matrix apa::KalmanFilter::getMatrixDelta_awesomeMistakeState()
 {
 	return matrixDelta_awesomeMistakeState;
 }
+
+Matrix apa::KalmanFilter::getMatrixOfConfidenceIntervalBoundsForEstimationVector() // up - low
+{
+	Matrix result(4, 2);
+
+	double confidenceProbability = 3.0;
+
+	Vector vectorBorder = confidenceProbability * (matrixDelta_awesomeMistakeState.diagonal()).array().sqrt();
+
+	Vector upperLimit = vectorDelta_awesomeState + vectorBorder;
+	Vector lowerLimit = vectorDelta_awesomeState - vectorBorder;
+
+	result.col(0) = upperLimit;
+	result.col(1) = lowerLimit;
+
+	return result;
+}

@@ -14,7 +14,7 @@ apa::SensorNoise::SensorNoise()
 
 Vector apa::SensorNoise::getSensorNoise(const double& time)
 {
-	return noiseSensor->getVectorRejection(time);
+	return noiseSensor->getVectorRejection(time, 0xABCDEFDD);
 }
 
 
@@ -55,6 +55,11 @@ Vector apa::Locator::getVectorDelta_awesomeState()
 	return KF->getVectorDelta_awesomeState();
 }
 
+Matrix apa::Locator::getBorderOfConfidenceInterval()
+{
+	return KF->getMatrixOfConfidenceIntervalBoundsForEstimationVector();
+}
+
 Vector apa::Locator::getMeVectorState(const double& time)
 {
 	return me->getVectorState(time);
@@ -67,10 +72,12 @@ Vector apa::Locator::getTargetVectorState(const double& time)
 
 Vector apa::Locator::getVectorDelta_state(const double& time)
 {
+	double tar = getTargetVectorState(time)[2];
+	double me = getMeVectorState(time)[2];
+	double t = getTargetVectorState(time)[2] - getMeVectorState(time)[2];
 	Vector vec(4);
-	Vector vec2 = getTargetVectorState(time);
-	double r = vec2[0];
 	vec << getTargetVectorState(time) - getMeVectorState(time);
+	double r = vec[1];
 	return vec;
 }
 	

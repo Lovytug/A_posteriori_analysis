@@ -8,7 +8,7 @@ namespace apa
 	{
 	public:
 		RandomnessGenerator(const Eigen::VectorXd& mean, const Eigen::MatrixXd& cov);
-		Eigen::VectorXd getVectorRejection(const double& seed);
+		Eigen::VectorXd getVectorRejection(const double& seed, uint32_t uniqueOffset);
 
 	private:
 		std::mt19937 generator;
@@ -17,5 +17,7 @@ namespace apa
 		Eigen::VectorXd mean;
 		Eigen::MatrixXd cov;
 
+		static std::mt19937 globalGenerator; // Глобальный генератор для уникальных seed'ов
+		static bool isGlobalGeneratorInitialized;
 	};
 }

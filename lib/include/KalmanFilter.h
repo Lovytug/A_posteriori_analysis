@@ -1,5 +1,6 @@
 #pragma once
 #include <Eigen/Dense>
+#include <cmath>
 
 using Vector = Eigen::VectorXd;
 using Matrix = Eigen::MatrixXd;
@@ -13,7 +14,7 @@ namespace apa
 		void perfomFiltring(const Vector& vecMeasurement, const Vector& vecVelocityAiminig);
 		Vector getVectorDelta_awesomeState();
 		Matrix getMatrixDelta_awesomeMistakeState();
-
+		Matrix getMatrixOfConfidenceIntervalBoundsForEstimationVector();
 
 	private:
 		Vector vectorDelta_awesomeState; // X*

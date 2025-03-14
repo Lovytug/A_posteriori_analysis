@@ -27,6 +27,7 @@ namespace apa
 		void location(const Vector& vec, const double& time);
 		Vector getVectorDelta_state(const double& time);
 		Vector getVectorDelta_awesomeState(); //KF
+		Matrix getBorderOfConfidenceInterval(); //KF
 
 	private:
 		Trans_ptr& me;

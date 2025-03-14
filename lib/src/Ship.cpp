@@ -11,7 +11,7 @@ apa::Waves::Waves(const Vector& mean, const Matrix& cov)
 
 Vector apa::Waves::getTrueVelocity(const double& time)
 {
-	return meanVelocity + fluctation->getVectorRejection(time); // plus vector fluctation
+	return meanVelocity + fluctation->getVectorRejection(time, 0xDEADBEEF); // plus vector fluctation
 }
 
 
