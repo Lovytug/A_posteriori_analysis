@@ -6,6 +6,11 @@
 #include "Helicopter.h"
 #include "Ship.h"
 
+#define SECONDS 60.0;
+
+#define SEC2 3600.0
+
+
 using Trans_ptr = std::shared_ptr<apa::Transport>;
 using OnBoard_ptr = std::shared_ptr<apa::OnBoardSystem>;
 using Locator_ptr = std::shared_ptr<apa::Locator>;
@@ -16,7 +21,7 @@ namespace apa
 	{
 	public:
 		MonitoringComplex(const Trans_ptr& obj1, const Trans_ptr& obj2, OnBoard_ptr& OBS, const double& allTime);
-		void trackMovementOfGoals();
+		void trackMovementOfGoals(const double& deltaT);
 		std::vector<double> getVectorTime();
 
 		std::vector<double> stl_getVectorPositionX_ship();

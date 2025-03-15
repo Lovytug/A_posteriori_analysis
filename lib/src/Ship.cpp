@@ -21,9 +21,9 @@ apa::Ship::Ship(const Vector& vecPos, const NatDist_ptr& wave) : radiusVector(ve
 	this->wave = wave;
 }
 
-void apa::Ship::move(const double& time)
+void apa::Ship::move(const double& time, const double& dT)
 {
-	Vector next_radiusVector = radiusVector + wave->getTrueVelocity(time);
+	Vector next_radiusVector = radiusVector + dT * wave->getTrueVelocity(time);
 	
 	radiusVector = next_radiusVector;
 }

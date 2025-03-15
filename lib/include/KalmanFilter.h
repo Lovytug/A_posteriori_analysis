@@ -10,7 +10,7 @@ namespace apa
 	class KalmanFilter
 	{
 	public:
-		KalmanFilter(const Vector& vec, const Matrix& matrix);
+		KalmanFilter(const Vector& vecMeas, const Vector& vec, const Matrix& matrix, const double& dT);
 		void perfomFiltring(const Vector& vecMeasurement, const Vector& vecVelocityAiminig);
 		Vector getVectorDelta_awesomeState();
 		Matrix getMatrixDelta_awesomeMistakeState();

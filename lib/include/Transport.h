@@ -19,7 +19,7 @@ namespace apa
 	{
 	public:
 		Transport() = default;
-		virtual void move(const double& currentTime) = 0;
+		virtual void move(const double& currentTime, const double& dT) = 0;
 		virtual Vector getVectorState(const double& time) = 0;
 	};
 }

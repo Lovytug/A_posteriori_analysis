@@ -1,6 +1,6 @@
 #include "KalmanFilter.h"
 
-apa::KalmanFilter::KalmanFilter(const Vector& vec_forecast, const Matrix& matrix_forecast)
+apa::KalmanFilter::KalmanFilter(const Vector& vecMeas, const Vector& vec_forecast, const Matrix& matrix_forecast, const double& dT)
 {
 	int32_t n = 4;
 	int32_t l = 2;
@@ -15,8 +15,8 @@ apa::KalmanFilter::KalmanFilter(const Vector& vec_forecast, const Matrix& matrix
 
 
 	F.resize(n, n);
-	F << 1, 0, 1, 0,
-		0, 1, 0, 1,
+	F << 1, 0, dT, 0,
+		0, 1, 0, dT,
 		0, 0, 1, 0,
 		0, 0, 0, 1;
 
@@ -32,8 +32,8 @@ apa::KalmanFilter::KalmanFilter(const Vector& vec_forecast, const Matrix& matrix
 	U.setZero();
 
 	V.resize(n, k);
-	V << -1, 0,
-		0, -1,
+	V << -dT, 0,
+		0, -dT,
 		0, 0,
 		0, 0;
 
@@ -49,12 +49,16 @@ apa::KalmanFilter::KalmanFilter(const Vector& vec_forecast, const Matrix& matrix
 			0, 0, 1, 0,
 			0, 0, 0, 1;
 	
+	Matrix inverse_matrixForecast = matrixDelta_forecastMistakeState.inverse();
+	Matrix H_tr = H.transpose();
+	Matrix D_nu_in = D_nu.inverse();
+	matrixDelta_awesomeMistakeState = (inverse_matrixForecast + H_tr * D_nu_in * H).inverse();
+	vectorDelta_awesomeState = vectorDelta_forecastState + matrixDelta_awesomeMistakeState * H_tr * D_nu_in * (vecMeas - H * vectorDelta_forecastState);
+
 }
 
 void apa::KalmanFilter::perfomFiltring(const Vector& vecMeas, const Vector& vecVelH)
 {
-	int size = matrixDelta_forecastMistakeState.size();
-
 	Matrix inverse_matrixForecast = matrixDelta_forecastMistakeState.inverse();
 	Matrix H_tr = H.transpose();
 	Matrix D_nu_in = D_nu.inverse();
@@ -97,8 +101,8 @@ Matrix apa::KalmanFilter::getMatrixOfConfidenceIntervalBoundsForEstimationVector
 
 	Vector vectorBorder = confidenceProbability * (matrixDelta_awesomeMistakeState.diagonal()).array().sqrt();
 
-	Vector upperLimit = vectorDelta_awesomeState + vectorBorder;
-	Vector lowerLimit = vectorDelta_awesomeState - vectorBorder;
+	Vector upperLimit = vectorBorder;
+	Vector lowerLimit = -vectorBorder;
 
 	result.col(0) = upperLimit;
 	result.col(1) = lowerLimit;

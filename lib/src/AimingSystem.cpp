@@ -1,9 +1,17 @@
 #include "AimingSystem.h"
 
-apa::AimingSystem::AimingSystem()
+apa::AimingSystem::AimingSystem(const Vector& vec, const double& dT)
 {
 	vectorVelocityAiming.resize(2);
-	vectorVelocityAiming.setZero();
+
+	Vector vecDelta_awePos = vec.segment(0, 2);
+	Vector vecDelta_aweVel = vec.segment(2, 2);
+
+	double div = 0.5 * 1.0 / dT;
+	Vector result = vecDelta_awePos * div + vecDelta_aweVel ;
+
+	if (!(getModuleVectorVelocity(result) <= maxModuleVelocity))
+		vectorVelocityAiming = normalize(result);
 }
 
 Vector apa::AimingSystem::getVectorVelocityAiming()
@@ -11,12 +19,13 @@ Vector apa::AimingSystem::getVectorVelocityAiming()
 	return vectorVelocityAiming;
 }
 
-Vector apa::AimingSystem::getVectorVelocityAiming(const Vector& vectorState)
+Vector apa::AimingSystem::getVectorVelocityAiming(const Vector& vectorState, const double& dT)
 {
 	Vector vecDelta_awePos = vectorState.segment(0, 2);
 	Vector vecDelta_aweVel = vectorState.segment(2, 2);
 
-	Vector result = vecDelta_awePos * .5 + vecDelta_aweVel;
+	double div = 0.5 * 1.0 / dT;
+	Vector result = vecDelta_awePos * div  + vecDelta_aweVel;
 
 	if (!(getModuleVectorVelocity(result) <= maxModuleVelocity))
 		vectorVelocityAiming = normalize(result);

@@ -72,9 +72,6 @@ Vector apa::Locator::getTargetVectorState(const double& time)
 
 Vector apa::Locator::getVectorDelta_state(const double& time)
 {
-	double tar = getTargetVectorState(time)[2];
-	double me = getMeVectorState(time)[2];
-	double t = getTargetVectorState(time)[2] - getMeVectorState(time)[2];
 	Vector vec(4);
 	vec << getTargetVectorState(time) - getMeVectorState(time);
 	double r = vec[1];

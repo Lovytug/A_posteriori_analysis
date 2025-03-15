@@ -11,6 +11,7 @@ void drawPlot(const stlVec_doub& X1, const stlVec_doub& Y1, const stlVec_doub& X
 {
 	auto fig = matplot::figure();
 	fig->size(800, 800);
+	fig->position(0, 0);
 	matplot::hold(true);
 	auto plot1 = matplot::plot(X1, Y1);
 	plot1->color("blue");
@@ -28,6 +29,7 @@ void drawPlot(const stlVec_doub& X1, const stlVec_doub& X2, const stlVec_doub& t
 	auto fig = matplot::figure();
 	fig->size(800, 800);
 	matplot::hold(true);
+	fig->position(500, 0);
 	auto plot1 = matplot::plot(time, X1);
 	plot1->color("blue");
 	plot1->line_width(2);
@@ -43,6 +45,7 @@ void drawPlot(const stlVec_doub& X, const stlVec_doub& UP, const stlVec_doub& LO
 {
 	auto fig = matplot::figure();
 	fig->size(800, 800);
+	fig->position(1000, 0);
 	matplot::hold(true);
 	auto plot = matplot::plot(time, X);
 	plot->color("green");
@@ -94,25 +97,27 @@ void main()
 	NatDist_ptr wind = std::make_shared<apa::Wind>(mean_wind, cov_wind);
 
 	Vector pos1(2);
-	pos1 << 100000, 10;
+	pos1 << 10000, 0;
 	Vector pos2(2);
-	pos2 << -1000, -1000;
+	pos2 << -10000, -0;
 
 	Matrix P(4, 4);
-	P << 10.1, 0, 0, 0,
-		0, 10.1, 0, 0,
+	P << 10.0, 0, 0, 0,
+		0, 1.0, 0, 0,
 		0, 0, 0.01, 0,
 		0, 0, 0, 0.01;
+
+	double allTime = 0.01;
+	double deltaT = .01;
 
 	std::shared_ptr<apa::OnBoardSystem> OBS;
 	Trans_ptr ship = std::make_shared<apa::Ship>(pos1, wave);
 	Trans_ptr heli = std::make_shared<apa::Helicopter>(pos2, wind, OBS);
 
-	OBS = std::make_shared<apa::OnBoardSystem>(ship, heli, P);
+	OBS = std::make_shared<apa::OnBoardSystem>(ship, heli, P, deltaT);
 
-	double allTime = 0.5 * 60 * 60;
 	std::shared_ptr<apa::MonitoringComplex> monitor = std::make_shared<apa::MonitoringComplex>(ship, heli, OBS, allTime);
-	monitor->trackMovementOfGoals();
+	monitor->trackMovementOfGoals(deltaT);
 
 	auto vecTime = monitor->getVectorTime();
 
@@ -151,7 +156,7 @@ void main()
 	drawPlot(delPosX_tr - delPosX_aw, upDelPosX_aw, lowDelPosX_aw, vecTime, "delta pos mistake X true and awesome");
 	drawPlot(delPosY_tr - delPosY_aw, upDelPosY_aw, lowDelPosY_aw, vecTime, "delta pos mistake Y true and awesome");
 	drawPlot(delVelX_tr - delVelX_aw, upDelVelX_aw, lowDelVelX_aw, vecTime, "delta vel mistake X true and awesome");
-	drawPlot(delVelY_tr - delVelX_aw, upDelVelY_aw, lowDelVelY_aw, vecTime, "delta vel mistake Y true and awesome");
+	drawPlot(delVelY_tr - delVelY_aw, upDelVelY_aw, lowDelVelY_aw, vecTime, "delta vel mistake Y true and awesome");
 
 
 	matplot::show();

@@ -27,7 +27,7 @@ namespace apa
 		Ship(const Vector& vecPos, const NatDist_ptr& wave);
 
 	protected:
-		void move(const double& time) override;
+		void move(const double& time, const double& dT) override;
 		Vector getVectorState(const double& time) override;
 
 	private:

@@ -7,16 +7,17 @@ apa::MonitoringComplex::MonitoringComplex(const Trans_ptr& sh, const Trans_ptr& 
 	ship = sh;
 	locator = OBS->getLocator();
 	currentTime = 0.0;
-	durationOfGoalTracking = allTime;
+	durationOfGoalTracking = allTime * SEC2;
 }
 
-void apa::MonitoringComplex::trackMovementOfGoals()
+void apa::MonitoringComplex::trackMovementOfGoals(const double& deltaT)
 {
-	double tik = 1.0;
+	double tik = deltaT;
+	currentTime += tik;
 	while (currentTime < durationOfGoalTracking)
 	{
-		helicopter->move(currentTime);
-		ship->move(currentTime);
+		helicopter->move(currentTime, deltaT);
+		ship->move(currentTime, deltaT);
 
 		appendToVector(vectorState_ship, ship->getVectorState(currentTime));
 		appendToVector(vectorState_helicopter, helicopter->getVectorState(currentTime));
@@ -37,7 +38,7 @@ void apa::MonitoringComplex::trackMovementOfGoals()
 
 bool apa::MonitoringComplex::checkIntersection(const Vector& vec1, const Vector& vec2)
 {
-	if(vec1[0] < vec2[0])
+	if(abs(vec1[0] - vec2[0]) <= 1 && abs(vec1[1] - vec2[1]) <= 1)
 		return true;
 	else
 		return false;
