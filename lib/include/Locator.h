@@ -12,7 +12,7 @@ namespace apa
 	{
 	public:
 		SensorNoise();
-		Vector getSensorNoise(const double& time);
+		inline Vector getSensorNoise(const double& time);
 
 	protected:
 		std::shared_ptr<RandomnessGenerator> noiseSensor;
@@ -25,6 +25,8 @@ namespace apa
 	public:
 		Locator(Trans_ptr& target, Trans_ptr& hunter, Kalman_ptr& KF);
 		void location(const Vector& vec, const double& time);
+		Trans_ptr getObjectHunter();
+		Trans_ptr getObjectTarget();
 		Vector getVectorDelta_state(const double& time);
 		Vector getVectorDelta_awesomeState(); //KF
 		Matrix getBorderOfConfidenceInterval(); //KF

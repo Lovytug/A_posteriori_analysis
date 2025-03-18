@@ -1,10 +1,8 @@
 #include "MonitoringComplex.h"
 #include <iostream>
 
-apa::MonitoringComplex::MonitoringComplex(const Trans_ptr& sh, const Trans_ptr& helic, OnBoard_ptr& OBS, const double& allTime)
+apa::MonitoringComplex::MonitoringComplex(OnBoard_ptr& OBS, const double& allTime)
 {
-	helicopter = helic;
-	ship = sh;
 	locator = OBS->getLocator();
 	currentTime = 0.0;
 	durationOfGoalTracking = allTime * SEC2;
@@ -16,11 +14,11 @@ void apa::MonitoringComplex::trackMovementOfGoals(const double& deltaT)
 	currentTime += tik;
 	while (currentTime < durationOfGoalTracking)
 	{
-		helicopter->move(currentTime, deltaT);
-		ship->move(currentTime, deltaT);
+		locator->getObjectHunter()->move(currentTime, deltaT);
+		locator->getObjectTarget()->move(currentTime, deltaT);
 
-		appendToVector(vectorState_ship, ship->getVectorState(currentTime));
-		appendToVector(vectorState_helicopter, helicopter->getVectorState(currentTime));
+		appendToVector(vectorState_ship, locator->getObjectTarget()->getVectorState(currentTime));
+		appendToVector(vectorState_helicopter, locator->getObjectHunter()->getVectorState(currentTime));
 
 		appendToVector(vectorDelta_trueState, locator->getVectorDelta_state(currentTime));
 		appendToVector(vectorDelta_awesomeState, locator->getVectorDelta_awesomeState());
@@ -31,7 +29,7 @@ void apa::MonitoringComplex::trackMovementOfGoals(const double& deltaT)
 
 		vectorTimes.push_back(currentTime);
 
-		if(checkIntersection(ship->getVectorState(currentTime - tik), helicopter->getVectorState(currentTime - tik)))
+		if(checkIntersection(locator->getObjectTarget()->getVectorState(currentTime - tik), locator->getObjectHunter()->getVectorState(currentTime - tik)))
 			break;
 	}
 }

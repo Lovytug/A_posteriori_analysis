@@ -12,7 +12,7 @@ apa::SensorNoise::SensorNoise()
 	noiseSensor = std::make_shared<RandomnessGenerator>(vectorMean, matrixCov);
 }
 
-Vector apa::SensorNoise::getSensorNoise(const double& time)
+__forceinline Vector apa::SensorNoise::getSensorNoise(const double& time)
 {
 	return noiseSensor->getVectorRejection(time, 0xABCDEFDD);
 }
@@ -42,12 +42,18 @@ void apa::Locator::writeRealDataFromObject(const double& time)
 
 Vector apa::Locator::getVisibleVector()
 {
-	Vector result(2);
-	result = noiseDelta_position;
-
-	return result;
+	return noiseDelta_position;
 }
 
+Trans_ptr apa::Locator::getObjectHunter()
+{
+	return me;
+}
+
+Trans_ptr apa::Locator::getObjectTarget()
+{
+	return target;
+}
 
 
 Vector apa::Locator::getVectorDelta_awesomeState()
@@ -72,9 +78,6 @@ Vector apa::Locator::getTargetVectorState(const double& time)
 
 Vector apa::Locator::getVectorDelta_state(const double& time)
 {
-	Vector vec(4);
-	vec << getTargetVectorState(time) - getMeVectorState(time);
-	double r = vec[1];
-	return vec;
+	return getTargetVectorState(time) - getMeVectorState(time);
 }
 	

@@ -20,7 +20,7 @@ namespace apa
 	class MonitoringComplex
 	{
 	public:
-		MonitoringComplex(const Trans_ptr& obj1, const Trans_ptr& obj2, OnBoard_ptr& OBS, const double& allTime);
+		MonitoringComplex(OnBoard_ptr& OBS, const double& allTime);
 		void trackMovementOfGoals(const double& deltaT);
 		std::vector<double> getVectorTime();
 
@@ -50,8 +50,6 @@ namespace apa
 		std::vector<double> stl_getVectorLowerLimit_DeltaVelY_awesomeState();
 
 	private:
-		Trans_ptr helicopter;
-		Trans_ptr ship;
 		Locator_ptr locator;
 		double currentTime;
 		double durationOfGoalTracking;
