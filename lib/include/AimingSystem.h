@@ -15,7 +15,7 @@ namespace apa
 
 	private:
 		Vector vectorVelocityAiming;
-		double maxModuleVelocity = 250.0;
+		double maxModuleVelocity = 70.0; // m/sec
 
 		Vector normalize(const Vector& vec);
 		double getModuleVectorVelocity(const Vector& vec);

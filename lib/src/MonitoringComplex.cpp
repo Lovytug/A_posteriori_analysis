@@ -29,7 +29,7 @@ void apa::MonitoringComplex::trackMovementOfGoals(const double& deltaT)
 
 		vectorTimes.push_back(currentTime);
 
-		if(checkIntersection(locator->getObjectTarget()->getVectorState(currentTime - tik), locator->getObjectHunter()->getVectorState(currentTime - tik)))
+		if (checkIntersection(locator->getObjectTarget()->getVectorState(currentTime - tik), locator->getObjectHunter()->getVectorState(currentTime - tik)))
 			break;
 	}
 }

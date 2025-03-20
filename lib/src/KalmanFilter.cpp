@@ -5,7 +5,7 @@ apa::KalmanFilter::KalmanFilter(const Vector& vecMeas, const Vector& vec_forecas
 	int32_t n = 4;
 	int32_t l = 2;
 	int32_t k = 2;
-	int32_t m = 4;
+	int32_t m = 2;
 	vectorDelta_awesomeState.resize(n);
 	matrixDelta_awesomeMistakeState.resize(n, n);
 	vectorDelta_forecastState.resize(n);
@@ -38,16 +38,14 @@ apa::KalmanFilter::KalmanFilter(const Vector& vecMeas, const Vector& vec_forecas
 		0, 0;
 
 	L.resize(n, m);
-	L << 0, 0, 0, 0,
-		0, 0, 0, 0,
-		1, 0, -1, 0,
-		0, 1, 0, -1;
+	L << 0, 0,
+		0, 0,
+		1, 0,
+		0, 1;
 
 	D_ksi.resize(m, m); // matrix cov wind and wave
-	D_ksi << 0.25, 0, 0, 0,
-			0, 0.25, 0, 0,
-			0, 0, 1, 0,
-			0, 0, 0, 1;
+	D_ksi << 1.25, 0,
+			0, 1.25;
 	
 	Matrix inverse_matrixForecast = matrixDelta_forecastMistakeState.inverse();
 	Matrix H_tr = H.transpose();

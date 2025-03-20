@@ -110,17 +110,17 @@ void main()
 	NatDist_ptr wind = std::make_shared<apa::Wind>(mean_wind, cov_wind);
 
 	Vector pos1(2);
-	pos1 << 10000, 0;
+	pos1 << 1000, 1000;
 	Vector pos2(2);
-	pos2 << -10000, -0;
+	pos2 << -1000, -1000;
 
 	Matrix P(4, 4);
 	P << 10.0, 0, 0, 0,
-		0, 1.0, 0, 0,
+		0, 10.0, 0, 0,
 		0, 0, 0.01, 0,
 		0, 0, 0, 0.01;
 
-	double allTime = 0.01;
+	double allTime = 0.02;
 	double deltaT = .01;
 
 	std::shared_ptr<apa::OnBoardSystem> OBS;
