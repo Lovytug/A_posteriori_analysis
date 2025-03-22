@@ -1,6 +1,6 @@
 #include "KalmanFilter.h"
 
-apa::KalmanFilter::KalmanFilter(const Vector& vecMeas, const Vector& vec_forecast, const Matrix& matrix_forecast, const double& dT)
+apa::KalmanFilter::KalmanFilter(const Vector& vec_forecast, const Matrix& matrix_forecast, const double& dT)
 {
 	int32_t n = 4;
 	int32_t l = 2;
@@ -10,6 +10,7 @@ apa::KalmanFilter::KalmanFilter(const Vector& vecMeas, const Vector& vec_forecas
 	matrixDelta_awesomeMistakeState.resize(n, n);
 	vectorDelta_forecastState.resize(n);
 	matrixDelta_forecastMistakeState.resize(n, n);
+
 	vectorDelta_forecastState = vec_forecast;
 	matrixDelta_forecastMistakeState = matrix_forecast;
 
@@ -46,16 +47,9 @@ apa::KalmanFilter::KalmanFilter(const Vector& vecMeas, const Vector& vec_forecas
 	D_ksi.resize(m, m); // matrix cov wind and wave
 	D_ksi << 1.25, 0,
 			0, 1.25;
-	
-	Matrix inverse_matrixForecast = matrixDelta_forecastMistakeState.inverse();
-	Matrix H_tr = H.transpose();
-	Matrix D_nu_in = D_nu.inverse();
-	matrixDelta_awesomeMistakeState = (inverse_matrixForecast + H_tr * D_nu_in * H).inverse();
-	vectorDelta_awesomeState = vectorDelta_forecastState + matrixDelta_awesomeMistakeState * H_tr * D_nu_in * (vecMeas - H * vectorDelta_forecastState);
-
 }
 
-void apa::KalmanFilter::perfomFiltring(const Vector& vecMeas, const Vector& vecVelH)
+void apa::KalmanFilter::perfomFiltring(const Vector& vecMeas, const double& dT)
 {
 	Matrix inverse_matrixForecast = matrixDelta_forecastMistakeState.inverse();
 	Matrix H_tr = H.transpose();
@@ -63,16 +57,18 @@ void apa::KalmanFilter::perfomFiltring(const Vector& vecMeas, const Vector& vecV
 	matrixDelta_awesomeMistakeState = (inverse_matrixForecast + H_tr * D_nu_in * H).inverse();
 	vectorDelta_awesomeState = vectorDelta_forecastState + matrixDelta_awesomeMistakeState * H_tr * D_nu_in * (vecMeas - H * vectorDelta_forecastState);
 
-	double r = vectorDelta_awesomeState[0];
-	double v = vectorDelta_awesomeState[1];
-	double v2 = vectorDelta_awesomeState[2];
-	double v3 = vectorDelta_awesomeState[3];
-
 
 	Matrix next_matrixDelta_forecastMistState(4, 4);
 	Vector next_vectorDelta_forecastState(4);
+	Vector vecDelta_awePos = vectorDelta_forecastState.segment(0, 2);
+	Vector vecDelta_aweVel = vectorDelta_forecastState.segment(2, 2);
 
-	U = vecVelH;
+	double div = 0.5 * 1.0 / dT;
+	Vector aimVelocity = vecDelta_awePos * div + vecDelta_aweVel;
+	if (!(aimVelocity.norm() <= 70.0))
+		aimVelocity = aimVelocity / aimVelocity.norm() * 70.0;
+	U = aimVelocity;
+
 	next_matrixDelta_forecastMistState = F * matrixDelta_awesomeMistakeState * F.transpose() + L * D_ksi * L.transpose();
 	next_vectorDelta_forecastState = F * vectorDelta_awesomeState + V * U;
 
@@ -80,6 +76,8 @@ void apa::KalmanFilter::perfomFiltring(const Vector& vecMeas, const Vector& vecV
 	matrixDelta_forecastMistakeState = next_matrixDelta_forecastMistState;
 	vectorDelta_forecastState = next_vectorDelta_forecastState;
 }
+
+
 
 Vector apa::KalmanFilter::getVectorDelta_awesomeState()
 {

@@ -26,10 +26,10 @@ apa::Locator::Locator(Trans_ptr& target, Trans_ptr& hunter, Kalman_ptr& KF) : me
 	noise = std::make_shared<SensorNoise>();
 }
 
-void apa::Locator::location(const Vector& vecAimVel, const double& time)
+void apa::Locator::location(const double& time, const double& dT)
 {
 	writeRealDataFromObject(time);
-	KF->perfomFiltring(getVisibleVector(), vecAimVel);
+	KF->perfomFiltring(getVisibleVector(), dT);
 }
 
 void apa::Locator::writeRealDataFromObject(const double& time)

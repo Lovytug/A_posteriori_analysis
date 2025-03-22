@@ -9,8 +9,7 @@ namespace apa
 	class AimingSystem
 	{
 	public:
-		AimingSystem(const Vector& vec, const double& dT);
-		Vector getVectorVelocityAiming();
+		AimingSystem();
 		Vector getVectorVelocityAiming(const Vector& vectorState, const double& dT);
 
 	private:

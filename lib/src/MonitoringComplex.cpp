@@ -11,16 +11,16 @@ apa::MonitoringComplex::MonitoringComplex(OnBoard_ptr& OBS, const double& allTim
 void apa::MonitoringComplex::trackMovementOfGoals(const double& deltaT)
 {
 	double tik = deltaT;
-	currentTime += tik;
+	currentTime += 0;
 	while (currentTime < durationOfGoalTracking)
 	{
+		appendToVector(vectorDelta_trueState, locator->getVectorDelta_state(currentTime));
 		locator->getObjectHunter()->move(currentTime, deltaT);
 		locator->getObjectTarget()->move(currentTime, deltaT);
 
 		appendToVector(vectorState_ship, locator->getObjectTarget()->getVectorState(currentTime));
 		appendToVector(vectorState_helicopter, locator->getObjectHunter()->getVectorState(currentTime));
 
-		appendToVector(vectorDelta_trueState, locator->getVectorDelta_state(currentTime));
 		appendToVector(vectorDelta_awesomeState, locator->getVectorDelta_awesomeState());
 
 		appendBoundaryOfConfidenceIntervalToVector(locator->getBorderOfConfidenceInterval());

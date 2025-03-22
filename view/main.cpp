@@ -114,11 +114,13 @@ void main()
 	Vector pos2(2);
 	pos2 << -1000, -1000;
 
+	Vector X(4);
+	X << 0, 0, 10, 10;
 	Matrix P(4, 4);
-	P << 10.0, 0, 0, 0,
-		0, 10.0, 0, 0,
-		0, 0, 0.01, 0,
-		0, 0, 0, 0.01;
+	P << 10e7, 0, 0, 0,
+		0, 10e7, 0, 0,
+		0, 0, 100.0, 0,
+		0, 0, 0, 100.0;
 
 	double allTime = 0.02;
 	double deltaT = .01;
@@ -127,7 +129,7 @@ void main()
 	Trans_ptr ship = std::make_shared<apa::Ship>(pos1, wave);
 	Trans_ptr heli = std::make_shared<apa::Helicopter>(pos2, wind, OBS);
 
-	OBS = std::make_shared<apa::OnBoardSystem>(ship, heli, P, deltaT);
+	OBS = std::make_shared<apa::OnBoardSystem>(ship, heli, X, P, deltaT);
 
 	std::shared_ptr<apa::MonitoringComplex> monitor = std::make_shared<apa::MonitoringComplex>(OBS, allTime);
 	monitor->trackMovementOfGoals(deltaT);
@@ -138,21 +140,21 @@ void main()
 	auto posY_ship = monitor->stl_getVectorPositionY_ship();
 	auto posX_heli = monitor->stl_getVectorPositionX_helicopter();
 	auto posY_heli = monitor->stl_getVectorPositionY_helicopter();
-	drawPlot(posX_ship, posY_ship, posX_heli, posY_heli, "ship", "helicopter", "coord X, m", "coord Y, m");
+	//drawPlot(posX_ship, posY_ship, posX_heli, posY_heli, "ship", "helicopter", "coord X, m", "coord Y, m");
 
 	auto delPosX_tr = monitor->stl_getVectorDeltaPosX_trueState();
 	auto delPosY_tr = monitor->stl_getVectorDeltaPosY_trueState();
 	auto delPosX_aw = monitor->stl_getVectorDeltaPosX_awesomeState();
 	auto delPosY_aw = monitor->stl_getVectorDeltaPosY_awesomeState();
-	drawPlot(delPosX_tr, delPosX_aw, vecTime, "X", "X*", "t, sec", "X and X*, m");
-	drawPlot(delPosY_tr, delPosY_aw, vecTime, "Y", "Y*", "t, sec", "Y and Y*, m");
+	//drawPlot(delPosX_tr, delPosX_aw, vecTime, "X", "X*", "t, sec", "X and X*, m");
+	//drawPlot(delPosY_tr, delPosY_aw, vecTime, "Y", "Y*", "t, sec", "Y and Y*, m");
 
 	auto delVelX_tr = monitor->stl_getVectorDeltaVelX_trueState();
 	auto delVelY_tr = monitor->stl_getVectorDeltaVelY_trueState();
 	auto delVelX_aw = monitor->stl_getVectorDeltaVelX_awesomeState();
 	auto delVelY_aw = monitor->stl_getVectorDeltaVelY_awesomeState();
-	drawPlot(delVelX_tr, delVelX_aw, vecTime, "Vx", "Vx*", "t, sec", "Vx and Vx*, m/sec");
-	drawPlot(delVelY_tr, delVelY_aw, vecTime, "Vy", "Vy*", "t, sec", "Vy and Vy*, m/sec");
+	//drawPlot(delVelX_tr, delVelX_aw, vecTime, "Vx", "Vx*", "t, sec", "Vx and Vx*, m/sec");
+	//drawPlot(delVelY_tr, delVelY_aw, vecTime, "Vy", "Vy*", "t, sec", "Vy and Vy*, m/sec");
 
 
 	///
@@ -168,8 +170,8 @@ void main()
 
 	drawPlot(delPosX_tr - delPosX_aw, upDelPosX_aw, lowDelPosX_aw, vecTime, "X - X*", "t, sec", "X - X*, m");
 	drawPlot(delPosY_tr - delPosY_aw, upDelPosY_aw, lowDelPosY_aw, vecTime, "Y - Y*", "t, sec", "Y - Y*, m");
-	drawPlot(delVelX_tr - delVelX_aw, upDelVelX_aw, lowDelVelX_aw, vecTime, "Vx - Vx*", "t, sec", "Vx - Vx*, m/sec");
-	drawPlot(delVelY_tr - delVelY_aw, upDelVelY_aw, lowDelVelY_aw, vecTime, "Vy - Vy*", "t, sec", "Vy - Vy*, m/sec");
+	//drawPlot(delVelX_tr - delVelX_aw, upDelVelX_aw, lowDelVelX_aw, vecTime, "Vx - Vx*", "t, sec", "Vx - Vx*, m/sec");
+	//drawPlot(delVelY_tr - delVelY_aw, upDelVelY_aw, lowDelVelY_aw, vecTime, "Vy - Vy*", "t, sec", "Vy - Vy*, m/sec");
 
 
 	matplot::show();

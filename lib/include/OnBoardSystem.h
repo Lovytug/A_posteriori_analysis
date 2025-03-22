@@ -9,7 +9,7 @@ namespace apa
 	class OnBoardSystem
 	{
 	public:
-		OnBoardSystem(Trans_ptr& ship, Trans_ptr& heli, const Matrix& P, const double& dT);
+		OnBoardSystem(Trans_ptr& ship, Trans_ptr& heli, const Vector& X, const Matrix& P, const double& dT);
 		std::shared_ptr<Locator> getLocator();
 		std::shared_ptr<AimingSystem> getAimingSystem();
 

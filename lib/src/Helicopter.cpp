@@ -23,7 +23,7 @@ void apa::Helicopter::move(const double& time, const double& dT)
 {
 	auto locator = OBS->getLocator();
 	auto AS = OBS->getAimingSystem();
-	locator->location(AS->getVectorVelocityAiming(), time);
+	locator->location(time, dT);
 
 	Vector vectorVelosityHeli = AS->getVectorVelocityAiming(locator->getVectorDelta_awesomeState(), dT);
 	Vector next_radiusVector = radiusVector + dT * (vectorVelosityHeli + wind->getTrueVelocity(time));
