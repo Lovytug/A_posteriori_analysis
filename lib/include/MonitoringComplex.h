@@ -1,6 +1,7 @@
 #include <Eigen/Dense>
 #include <memory>
 #include <vector>
+
 #include "Transport.h"
 #include "OnBoardSystem.h"
 #include "Helicopter.h"
@@ -22,6 +23,7 @@ namespace apa
 	public:
 		MonitoringComplex(OnBoard_ptr& OBS, const double& allTime);
 		void trackMovementOfGoals(const double& deltaT);
+
 		std::vector<double> getVectorTime();
 
 		std::vector<double> stl_getVectorPositionX_ship();

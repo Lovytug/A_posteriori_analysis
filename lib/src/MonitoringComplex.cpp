@@ -15,6 +15,7 @@ void apa::MonitoringComplex::trackMovementOfGoals(const double& deltaT)
 	while (currentTime < durationOfGoalTracking)
 	{
 		appendToVector(vectorDelta_trueState, locator->getVectorDelta_state(currentTime));
+
 		locator->getObjectHunter()->move(currentTime, deltaT);
 		locator->getObjectTarget()->move(currentTime, deltaT);
 
