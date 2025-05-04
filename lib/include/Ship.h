@@ -1,37 +1,40 @@
 #pragma once
-#include "Transport.h"
 
 #include <memory>
-
-using NatDist_ptr = std::shared_ptr<apa::NaturalDisturbances>;
+#include <Eigen/Dense>
+#include "RandomnessGenerator.h"
 
 namespace apa
 {
-	class Waves : public NaturalDisturbances
+	using Vec2D = Eigen::Vector2d;
+	using Mat2D = Eigen::Matrix2d;
+
+	class Wave
 	{
 	public:
-		Waves(const Vector& meanVelocity, const Matrix& covMatrix);
-
-	protected:
-		Vector getTrueVelocity(const double& time) override;
+		Wave(Vec2D meanVelocity, Mat2D covMatrix);
+		Vec2D getTrueVelocity(const double time);
 
 	private:
-		std::shared_ptr<RandomnessGenerator> fluctation;
-		Vector meanVelocity;
-		Matrix covMatrix;
+		std::unique_ptr<RandomnessGenerator> fluctation;
+		Vec2D meanVelocity;
+		Mat2D covMatrix;
 	};
 
-	class Ship : public Transport
+
+	class Ship
 	{
 	public:
-		Ship(const Vector& vecPos, const NatDist_ptr& wave);
+		Ship(Vec2D vecPos);
 
-	protected:
-		void move(const double& time, const double& dT) override;
-		Vector getVectorState(const double& time) override;
+		void setFluctation(Vec2D mean, Mat2D cov);
+
+		void move(const double time, const double dT);
+
+		Eigen::Vector4d getVectorState(const double time);
 
 	private:
-		NatDist_ptr wave;
-		Vector radiusVector;
+		std::unique_ptr<Wave> wave;
+		Vec2D radiusVector;
 	};
 }

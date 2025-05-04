@@ -7,77 +7,76 @@ apa::SensorNoise::SensorNoise()
 
 	vectorMean << 0.0, 0.0;
 	matrixCov << 10.0, 0.0,
-				 0.0, 10.0;
+		0.0, 10.0;
 
-	noiseSensor = std::make_shared<RandomnessGenerator>(vectorMean, matrixCov);
+	noiseSensor = std::make_unique<RandomnessGenerator>(vectorMean, matrixCov);
 }
 
-__forceinline Vector apa::SensorNoise::getSensorNoise(const double& time)
+apa::Vec2D apa::SensorNoise::getSensorNoise(const double time)
 {
 	return noiseSensor->getVectorRejection(time, 0xABCDEFDD);
 }
 
 
-apa::Locator::Locator(Trans_ptr& target, Trans_ptr& hunter, Kalman_ptr& KF) : me(hunter), target(target), KF(KF)
+apa::Locator::Locator(Vec4D beginMean, Mat4D beginCov, const double dt)
 {
-	noiseDelta_position.resize(2);
-	noiseDelta_velocityFluct.resize(2);
-
-	noise = std::make_shared<SensorNoise>();
+	KF = std::make_unique<KalmanFilter>(std::move(beginMean), std::move(beginCov), dt);
+	noise = std::make_unique<SensorNoise>();
 }
 
-void apa::Locator::location(const double& time, const double& dT)
+void apa::Locator::explorStateCurrentTime_Hunter(const double time, const double dt)
 {
-	writeRealDataFromObject(time);
-	KF->perfomFiltring(getVisibleVector(), dT);
+	locHelic->explorStateCurrentTime_Helicopter(time, dt);
 }
 
-void apa::Locator::writeRealDataFromObject(const double& time)
+void apa::Locator::explorStateCurrentTime_Target(const double time, const double dt)
 {
-	Vector vectorDelta_state = getVectorDelta_state(time);
-
-	noiseDelta_position = vectorDelta_state.segment(0, 2) + noise->getSensorNoise(time); // возращать шумы
-	noiseDelta_velocityFluct = vectorDelta_state.segment(2, 2);
-}
-
-Vector apa::Locator::getVisibleVector()
-{
-	return noiseDelta_position;
-}
-
-Trans_ptr apa::Locator::getObjectHunter()
-{
-	return me;
-}
-
-Trans_ptr apa::Locator::getObjectTarget()
-{
-	return target;
+	locShip->explorStateCurrentTime_Ship(time, dt);
 }
 
 
-Vector apa::Locator::getVectorDelta_awesomeState()
+void apa::Locator::createTargetWithPosition(Vec2D position)
 {
+	locShip = std::make_shared<OnBoardLocatorShip>(std::move(position));
+}
+
+void apa::Locator::createHunterWithPosition(Vec2D position)
+{
+	locHelic = std::make_shared<OnBoardLocatorHelicopter>(std::move(position));
+	locHelic->establishConnection(shared_from_this());
+}
+
+
+void apa::Locator::setFluctationForTarget(Vec2D mean, Mat2D cov)
+{
+	locShip->setFluctation(std::move(mean), std::move(cov));
+}
+
+void apa::Locator::setFluctationForHunter(Vec2D mean, Mat2D cov)
+{
+	locHelic->setFluctation(std::move(mean), std::move(cov));
+}
+
+
+apa::Vec4D apa::Locator::get_DeltaEstimatedVector_Targ_Helic(const double time, const double dt)
+{
+	Vec4D vec_delta_noise{ get_DetltaVector_Targ_Helic(time).head(2) + noise->getSensorNoise(time)};
+	KF->perfomFiltring(std::move(vec_delta_noise), dt);
+	
 	return KF->getVectorDelta_awesomeState();
 }
 
-Matrix apa::Locator::getBorderOfConfidenceInterval()
+apa::Vec4D apa::Locator::get_DetltaVector_Targ_Helic(const double time)
 {
-	return KF->getMatrixOfConfidenceIntervalBoundsForEstimationVector();
+	return getVectorStateTarget(time) - getVectorStateHunter(time);
 }
 
-Vector apa::Locator::getMeVectorState(const double& time)
+apa::Vec4D apa::Locator::getVectorStateTarget(const double time)
 {
-	return me->getVectorState(time);
+	return locShip->getVectorState(time);
 }
 
-Vector apa::Locator::getTargetVectorState(const double& time)
+apa::Vec4D apa::Locator::getVectorStateHunter(const double time)
 {
-	return target->getVectorState(time);
+	return locHelic->getVectorState(time);
 }
-
-Vector apa::Locator::getVectorDelta_state(const double& time)
-{
-	return getTargetVectorState(time) - getMeVectorState(time);
-}
-	

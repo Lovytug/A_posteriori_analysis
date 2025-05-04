@@ -3,10 +3,12 @@ set(SRC_FILE
 	src/Ship.cpp 
 	src/Helicopter.cpp 
 	src/Locator.cpp 
+	src/OnBoardLocatorHelicopter.cpp
+	src/OnBoardLocatorShip.cpp
 	src/KalmanFilter.cpp
 	src/AimingSystem.cpp
 	src/RandomnessGenerator.cpp
-	src/OnBoardSystem.cpp
+	
 )
 
 add_library(MyLib STATIC ${SRC_FILE})

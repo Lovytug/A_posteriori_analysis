@@ -1,50 +1,64 @@
 #pragma once
-#include "Transport.h"
-#include "KalmanFilter.h"
-#include <memory>
 
-using Trans_ptr = std::shared_ptr<apa::Transport>;
-using Kalman_ptr = std::shared_ptr<apa::KalmanFilter>;
+#include <memory>
+#include <utility>
+#include <Eigen/Dense>
+#include "KalmanFilter.h"
+#include "OnBoardLocatorShip.h"
+#include "OnBoardLocatorHelicopter.h"
 
 namespace apa
 {
+	class OnBoardLocatorShip;
+	class OnBoardLocatorHelicopter;
+	class SensorNoise;
+
+	using Vec2D = Eigen::Vector2d;
+	using Vec4D = Eigen::Vector4d;
+	using Mat2D = Eigen::Matrix2d;
+	using Mat4D = Eigen::Matrix4d;
+
+	using Kalman_ptr = std::unique_ptr<KalmanFilter>;
+	using Sensor_ptr = std::unique_ptr<SensorNoise>;
+	using OBSL_ship_ptr = std::shared_ptr<OnBoardLocatorShip>;
+	using OBSL_helic_ptr = std::shared_ptr<OnBoardLocatorHelicopter>;
+
+
 	class SensorNoise
 	{
 	public:
 		SensorNoise();
-		inline Vector getSensorNoise(const double& time);
+		Vec2D getSensorNoise(const double time);
 
 	protected:
-		std::shared_ptr<RandomnessGenerator> noiseSensor;
-		Vector vectorMean;
-		Matrix matrixCov;
+		std::unique_ptr<RandomnessGenerator> noiseSensor;
+		Vec2D vectorMean;
+		Mat2D matrixCov;
 	};
 
-	class Locator
+	class Locator : public std::enable_shared_from_this<Locator>
 	{
 	public:
-		Locator(Trans_ptr& target, Trans_ptr& hunter, Kalman_ptr& KF);
-		void location(const double& time, const double& dT);
-		Trans_ptr getObjectHunter();
-		Trans_ptr getObjectTarget();
-		Vector getVectorDelta_state(const double& time);
-		Vector getVectorDelta_awesomeState(); //KF
-		Matrix getBorderOfConfidenceInterval(); //KF
+		Locator(Vec4D beginMean, Mat4D beginCov, const double dt);
+
+		void explorStateCurrentTime_Hunter(const double time, const double dt);
+		void explorStateCurrentTime_Target(const double time, const double dt);
+
+		void createTargetWithPosition(Vec2D position);
+		void createHunterWithPosition(Vec2D position);
+		void setFluctationForTarget(Vec2D mean, Mat2D cov);
+		void setFluctationForHunter(Vec2D mean, Mat2D cov);
+
+		Vec4D get_DeltaEstimatedVector_Targ_Helic(const double time, const double dt);
+		Vec4D get_DetltaVector_Targ_Helic(const double time);
 
 	private:
-		Trans_ptr& me;
-		Trans_ptr& target;
+		Sensor_ptr noise;
 		Kalman_ptr KF;
-		std::shared_ptr<SensorNoise> noise;
-		Vector noiseDelta_position;
-		Vector noiseDelta_velocityFluct;
+		OBSL_ship_ptr locShip;
+		OBSL_helic_ptr locHelic;
 
-		//also for getVectorDelta_state() 
-		Vector getMeVectorState(const double& time);
-		Vector getTargetVectorState(const double& time);
-
-		void writeRealDataFromObject(const double& time);
-		Vector getVisibleVector();
-
+		Vec4D getVectorStateTarget(const double time);
+		Vec4D getVectorStateHunter(const double time);
 	};
 }

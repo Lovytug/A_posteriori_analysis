@@ -1,41 +1,46 @@
 #pragma once
-#include "Transport.h"
-#include "Locator.h"
-#include "AimingSystem.h"
-#include "OnBoardSystem.h"
-#include <memory>
 
-using Trans_ptr = std::shared_ptr<apa::Transport>;
-using NatDist_ptr = std::shared_ptr<apa::NaturalDisturbances>;
+#include <memory>
+#include "RandomnessGenerator.h"
+#include "AimingSystem.h"
+#include "OnBoardLocatorHelicopter.h"
 
 namespace apa
 {
-	class Wind : public NaturalDisturbances
+	class OnBoardLocatorHelicopter;
+
+	using Vec2D = Eigen::Vector2d;
+	using Mat2D = Eigen::Matrix2d;
+
+	class Wind
 	{
 	public:
-		Wind(const Vector& meanVelocity, const Matrix& covMatrix);
-
-	protected:
-		Vector getTrueVelocity(const double& time) override;
+		Wind(Vec2D meanVelocity, Mat2D covMatrix);
+		Vec2D getTrueVelocity(const double time);
 
 	private:
 		std::shared_ptr<RandomnessGenerator> fluctation;
-		Vector meanVelocity;
-		Matrix covMatrix;
+		Vec2D meanVelocity;
+		Mat2D covMatrix;
 	};
 
-	class Helicopter : public Transport
+	class Helicopter
 	{
 	public:
-		Helicopter(const Vector& vecPos, const NatDist_ptr& wind, std::shared_ptr<OnBoardSystem>& obs);
+		Helicopter(Vec2D vecPos);
 
-	protected:
-		void move(const double& time, const double& dT) override;
-		Vector getVectorState(const double& time) override;
+		void enableConnection(std::shared_ptr<OnBoardLocatorHelicopter> loc);
+
+		void setFluctation(Vec2D mean, Mat2D cov);
+
+		void move(const double time, const double dT);
+
+		Eigen::Vector4d getVectorState(const double time) ;
 
 	private:
-		NatDist_ptr wind;
-		std::shared_ptr<OnBoardSystem>& OBS;
-		Vector radiusVector;
+		std::unique_ptr<Wind> wind;
+		std::shared_ptr<OnBoardLocatorHelicopter> locator;
+		std::unique_ptr<AimingSystem> AS;
+		Vec2D radiusVector;
 	};
 }

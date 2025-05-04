@@ -90,7 +90,7 @@ std::vector<double> operator-(const std::vector<double>& lhs, const std::vector<
 
 void main()
 {
-	std::setlocale(LC_ALL, "en_US.UTF-8");
+	/*std::setlocale(LC_ALL, "en_US.UTF-8");
 
 	Vector mean_wave(2);
 	mean_wave << 0.95, 0.7;
@@ -175,5 +175,7 @@ void main()
 	drawPlot(delVelY_tr - delVelY_aw, upDelVelY_aw, lowDelVelY_aw, vecTime, "delta(Vy) - delta(Vy*)", "t, sec", "delta(Vy) - delta(Vy*), m/sec");
 
 
-	matplot::show();
+	matplot::show();*/
+
+
 }

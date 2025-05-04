@@ -1,266 +1,40 @@
 #include "MonitoringComplex.h"
-#include <iostream>
 
-apa::MonitoringComplex::MonitoringComplex(OnBoard_ptr& OBS, const double& allTime)
+apa::MonitoringComplex::MonitoringComplex(Vec4D beginMean, Mat4D beginCov, const double allTimeModeling, const double dt) :
+	totalSimulationTime(allTimeModeling), stepSimulation(dt)
 {
-	locator = OBS->getLocator();
-	currentTime = 0.0;
-	durationOfGoalTracking = allTime * SEC2;
+	locator = std::make_shared<Locator>(std::move(beginMean), std::move(beginCov), dt);
 }
 
-void apa::MonitoringComplex::trackMovementOfGoals(const double& deltaT)
+void apa::MonitoringComplex::startSimulation()
 {
-	double tik = deltaT;
-	currentTime += 0;
-	while (currentTime < durationOfGoalTracking)
+	double tik = stepSimulation;
+	double allTime = totalSimulationTime;
+	double currentTime = 0;
+	while (allTime > currentTime)
 	{
-		appendToVector(vectorDelta_trueState, locator->getVectorDelta_state(currentTime));
-
-		locator->getObjectHunter()->move(currentTime, deltaT);
-		locator->getObjectTarget()->move(currentTime, deltaT);
-
-		appendToVector(vectorState_ship, locator->getObjectTarget()->getVectorState(currentTime));
-		appendToVector(vectorState_helicopter, locator->getObjectHunter()->getVectorState(currentTime));
-
-		appendToVector(vectorDelta_awesomeState, locator->getVectorDelta_awesomeState());
-
-		appendBoundaryOfConfidenceIntervalToVector(locator->getBorderOfConfidenceInterval());
-
+		locator->explorStateCurrentTime_Hunter(currentTime, tik);
+		locator->explorStateCurrentTime_Target(currentTime, tik);
 		currentTime += tik;
-
-		vectorTimes.push_back(currentTime);
-
-		if (checkIntersection(locator->getObjectTarget()->getVectorState(currentTime - tik), locator->getObjectHunter()->getVectorState(currentTime - tik)))
-			break;
 	}
 }
 
-bool apa::MonitoringComplex::checkIntersection(const Vector& vec1, const Vector& vec2)
+void apa::MonitoringComplex::createTarget_Ship(Vec2D position) //поставить тип данных
 {
-	if(abs(vec1[0] - vec2[0]) <= 1 && abs(vec1[1] - vec2[1]) <= 1)
-		return true;
-	else
-		return false;
+	locator->createTargetWithPosition(std::move(position));
 }
 
-void apa::MonitoringComplex::appendToVector(Vector& vec, const Vector& newVec)
+void apa::MonitoringComplex::createHunter_Helicopter(Vec2D position) // поставиить тип днных
 {
-	int oldSize = vec.size();
-	vec.conservativeResize(oldSize + newVec.size());
-	vec.segment(oldSize, newVec.size()) = newVec;
+	locator->createHunterWithPosition(std::move(position));
 }
 
-void apa::MonitoringComplex::appendBoundaryOfConfidenceIntervalToVector(const Matrix& matrix)
+void apa::MonitoringComplex::setFluctationTarget_Ship(Vec2D mean, Mat2D cov)
 {
-	int oldSizeU = vectorUpperLimit_awesomeState.size();
-	vectorUpperLimit_awesomeState.conservativeResize(oldSizeU + matrix.rows());
-	vectorUpperLimit_awesomeState.segment(oldSizeU, matrix.rows()) = matrix.col(0);
-
-	int oldSizeL = vectorLowerLimit_awesomeState.size();
-	vectorLowerLimit_awesomeState.conservativeResize(oldSizeL + matrix.rows());
-	vectorLowerLimit_awesomeState.segment(oldSizeL, matrix.rows()) = matrix.col(1);
-
-	double t = vectorUpperLimit_awesomeState[0];
-	double r = vectorLowerLimit_awesomeState[0];
+	locator->setFluctationForTarget(std::move(mean), std::move(cov));
 }
 
-std::vector<double> apa::MonitoringComplex::transformInSTLvector(const Vector& vec)
+void apa::MonitoringComplex::setFluctationHunter_Helicopter(Vec2D mean, Mat2D cov)
 {
-	std::vector<double> stlVec(vec.data(), vec.data() + vec.size());
-	return stlVec;
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorPositionX_ship()
-{
-	Vector result(vectorState_ship.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorState_ship(4 * i);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorPositionY_ship()
-{
-	Vector result(vectorState_ship.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorState_ship(4 * i + 1);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorPositionX_helicopter()
-{
-	Vector result(vectorState_helicopter.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorState_helicopter(4 * i);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorPositionY_helicopter()
-{
-	Vector result(vectorState_helicopter.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorState_helicopter(4 * i + 1);
-
-	return transformInSTLvector(result);
-}
-
-// --- true and awesome state --- //
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorDeltaPosX_trueState()
-{
-	Vector result(vectorDelta_trueState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorDelta_trueState(4 * i);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorDeltaPosY_trueState()
-{
-	Vector result(vectorDelta_trueState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorDelta_trueState(4 * i + 1);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorDeltaVelX_trueState()
-{
-	double t = vectorDelta_trueState[2];
-	double t1 = vectorDelta_trueState[6];
-	Vector result(vectorDelta_trueState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorDelta_trueState(4 * i + 2);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorDeltaVelY_trueState()
-{
-	Vector result(vectorDelta_trueState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorDelta_trueState(4 * i + 3);
-
-	return transformInSTLvector(result);
-}
-
-
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorDeltaPosX_awesomeState()
-{
-	Vector result(vectorDelta_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorDelta_awesomeState(4 * i);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorDeltaPosY_awesomeState()
-{
-	Vector result(vectorDelta_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorDelta_awesomeState(4 * i + 1);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorDeltaVelX_awesomeState()
-{
-	Vector result(vectorDelta_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorDelta_awesomeState(4 * i + 2);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorDeltaVelY_awesomeState()
-{
-	Vector result(vectorDelta_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorDelta_awesomeState(4 * i + 3);
-
-	return transformInSTLvector(result);
-}
-
-
-// --- upper and low limit --- //
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorUpperLimit_DeltaPosX_awesomeState()
-{
-	Vector result(vectorUpperLimit_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorUpperLimit_awesomeState(4 * i);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorUpperLimit_DeltaPosY_awesomeState()
-{
-	Vector result(vectorUpperLimit_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorUpperLimit_awesomeState(4 * i + 1);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorUpperLimit_DeltaVelX_awesomeState()
-{
-	Vector result(vectorUpperLimit_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorUpperLimit_awesomeState(4 * i + 2);
-
-	return transformInSTLvector(result);
-}
-std::vector<double> apa::MonitoringComplex::stl_getVectorUpperLimit_DeltaVelY_awesomeState()
-{
-	Vector result(vectorUpperLimit_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorUpperLimit_awesomeState(4 * i + 3);
-
-	return transformInSTLvector(result);
-}
-
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorLowerLimit_DeltaPosX_awesomeState()
-{
-	Vector result(vectorLowerLimit_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorLowerLimit_awesomeState(4 * i);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorLowerLimit_DeltaPosY_awesomeState()
-{
-	Vector result(vectorLowerLimit_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorLowerLimit_awesomeState(4 * i + 1);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorLowerLimit_DeltaVelX_awesomeState()
-{
-	Vector result(vectorLowerLimit_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorLowerLimit_awesomeState(4 * i + 2);
-
-	return transformInSTLvector(result);
-}
-
-std::vector<double> apa::MonitoringComplex::stl_getVectorLowerLimit_DeltaVelY_awesomeState()
-{
-	Vector result(vectorLowerLimit_awesomeState.size() / 4);
-	for (int i = 0; i < result.size(); i++)
-		result[i] = vectorLowerLimit_awesomeState(4 * i + 3);
-
-	return transformInSTLvector(result);
-}
-
-
-std::vector<double> apa::MonitoringComplex::getVectorTime()
-{
-	return vectorTimes;
+	locator->setFluctationForHunter(std::move(mean), std::move(cov));
 }

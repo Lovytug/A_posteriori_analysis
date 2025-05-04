@@ -1,73 +1,33 @@
-#include <Eigen/Dense>
+#pragma once
 #include <memory>
-#include <vector>
-
-#include "Transport.h"
-#include "OnBoardSystem.h"
-#include "Helicopter.h"
-#include "Ship.h"
-
-#define SECONDS 60.0;
-
-#define SEC2 3600.0
-
-
-using Trans_ptr = std::shared_ptr<apa::Transport>;
-using OnBoard_ptr = std::shared_ptr<apa::OnBoardSystem>;
-using Locator_ptr = std::shared_ptr<apa::Locator>;
+#include <Eigen/Dense>
+#include "Locator.h"
 
 namespace apa
 {
+	using Vec2D = Eigen::Vector2d;
+	using Vec4D = Eigen::Vector4d;
+	using Mat2D = Eigen::Matrix2d;
+	using Mat4D = Eigen::Matrix4d;
+
+	using Locator_ptr = std::shared_ptr<Locator>;
+
 	class MonitoringComplex
 	{
 	public:
-		MonitoringComplex(OnBoard_ptr& OBS, const double& allTime);
-		void trackMovementOfGoals(const double& deltaT);
+		MonitoringComplex(Vec4D beginMean, Mat4D beginCov, const double allTimeModeling, const double dt);
 
-		std::vector<double> getVectorTime();
+		void startSimulation();
 
-		std::vector<double> stl_getVectorPositionX_ship();
-		std::vector<double> stl_getVectorPositionY_ship();
-		std::vector<double> stl_getVectorPositionX_helicopter();
-		std::vector<double> stl_getVectorPositionY_helicopter();
+		void createTarget_Ship(Vec2D position);
+		void createHunter_Helicopter(Vec2D position);
+		void setFluctationTarget_Ship(Vec2D mean, Mat2D cov);
+		void setFluctationHunter_Helicopter(Vec2D mean, Mat2D cov);
 
-		std::vector<double> stl_getVectorDeltaPosX_trueState();
-		std::vector<double> stl_getVectorDeltaPosY_trueState();
-		std::vector<double> stl_getVectorDeltaVelX_trueState();
-		std::vector<double> stl_getVectorDeltaVelY_trueState();
-
-		std::vector<double> stl_getVectorDeltaPosX_awesomeState();
-		std::vector<double> stl_getVectorDeltaPosY_awesomeState();
-		std::vector<double> stl_getVectorDeltaVelX_awesomeState();
-		std::vector<double> stl_getVectorDeltaVelY_awesomeState();
-
-		std::vector<double> stl_getVectorUpperLimit_DeltaPosX_awesomeState();
-		std::vector<double> stl_getVectorUpperLimit_DeltaPosY_awesomeState();
-		std::vector<double> stl_getVectorUpperLimit_DeltaVelX_awesomeState();
-		std::vector<double> stl_getVectorUpperLimit_DeltaVelY_awesomeState();
-
-		std::vector<double> stl_getVectorLowerLimit_DeltaPosX_awesomeState();
-		std::vector<double> stl_getVectorLowerLimit_DeltaPosY_awesomeState();
-		std::vector<double> stl_getVectorLowerLimit_DeltaVelX_awesomeState();
-		std::vector<double> stl_getVectorLowerLimit_DeltaVelY_awesomeState();
 
 	private:
 		Locator_ptr locator;
-		double currentTime;
-		double durationOfGoalTracking;
-		std::vector<double> vectorTimes;
-
-		Eigen::VectorXd vectorState_ship;
-		Eigen::VectorXd vectorState_helicopter;
-		Eigen::VectorXd vectorDelta_trueState;
-		Eigen::VectorXd vectorDelta_awesomeState;
-
-		Eigen::VectorXd vectorUpperLimit_awesomeState;
-		Eigen::VectorXd vectorLowerLimit_awesomeState;
-
-		void appendToVector(Vector& vec, const Vector& newVec);
-		void appendBoundaryOfConfidenceIntervalToVector(const Matrix& matrixBorder);
-		bool checkIntersection(const Vector& vec1, const Vector& vec2);
-		std::vector<double> transformInSTLvector(const Vector& vec);
+		double totalSimulationTime;
+		double stepSimulation;
 	};
 }

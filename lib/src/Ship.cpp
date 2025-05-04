@@ -1,37 +1,33 @@
 #include "Ship.h"
 
-apa::Waves::Waves(const Vector& mean, const Matrix& cov)
+apa::Wave::Wave(Vec2D mean, Mat2D cov)
 {
-	meanVelocity.resize(2);
-	covMatrix.resize(2, 2);
 	meanVelocity = mean;
 	covMatrix = cov;
-	fluctation = std::make_shared<RandomnessGenerator>(meanVelocity, covMatrix);
+	fluctation = std::make_unique<RandomnessGenerator>(std::move(mean), std::move(cov));
 }
 
-Vector apa::Waves::getTrueVelocity(const double& time)
+apa::Vec2D apa::Wave::getTrueVelocity(const double time)
 {
 	return meanVelocity + fluctation->getVectorRejection(time, 0xDEADBEEF); // plus vector fluctation
 }
 
 
+apa::Ship::Ship(Vec2D vecPos) : radiusVector(std::move(vecPos))
+{}
 
-apa::Ship::Ship(const Vector& vecPos, const NatDist_ptr& wave) : radiusVector(vecPos)
+void apa::Ship::setFluctation(Vec2D mean, Mat2D cov)
 {
-	this->wave = wave;
+	wave = std::make_unique<Wave>(std::move(mean), std::move(cov));
 }
 
-void apa::Ship::move(const double& time, const double& dT)
+void apa::Ship::move(const double time, const double dT)
 {
-	Vector next_radiusVector = radiusVector + dT * wave->getTrueVelocity(time);
-	
-	radiusVector = next_radiusVector;
+	if (wave != nullptr) radiusVector = radiusVector + dT * wave->getTrueVelocity(time);
+	else return void();
 }
 
-Vector apa::Ship::getVectorState(const double& time)
+Eigen::Vector4d apa::Ship::getVectorState(const double time)
 {
-	Vector vec(4);
-	vec.segment(0, 2) = radiusVector;
-	vec.segment(2, 2) = wave->getTrueVelocity(time);
-	return vec;
+	return (Eigen::Vector4d() << radiusVector, wave->getTrueVelocity(time)).finished();
 }

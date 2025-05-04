@@ -1,40 +1,41 @@
 #include "Helicopter.h"
 
-apa::Wind::Wind(const Vector& mean, const Matrix& cov)
+apa::Wind::Wind(Vec2D mean, Mat2D cov)
 {
-	meanVelocity.resize(2);
-	covMatrix.resize(2, 2);
 	meanVelocity = mean;
 	covMatrix = cov;
-	fluctation = std::make_shared<RandomnessGenerator>(meanVelocity, covMatrix);
+	fluctation = std::make_shared<RandomnessGenerator>(std::move(mean), std::move(cov));
 }
 
-Vector apa::Wind::getTrueVelocity(const double& time)
+apa::Vec2D apa::Wind::getTrueVelocity(const double time)
 {
 	return meanVelocity + fluctation->getVectorRejection(time, 0xBEEFFDDD); // plus vector fluctation
 }
 
 
-
-apa::Helicopter::Helicopter(const Vector& vecPos, const NatDist_ptr& wind, std::shared_ptr<OnBoardSystem>& obs) : 
-	radiusVector(vecPos), wind(wind), OBS(obs) {}
-
-void apa::Helicopter::move(const double& time, const double& dT)
+apa::Helicopter::Helicopter(Vec2D vecPos) : radiusVector(vecPos)
 {
-	auto locator = OBS->getLocator();
-	auto AS = OBS->getAimingSystem();
-	locator->location(time, dT);
-
-	Vector vectorVelosityHeli = AS->getVectorVelocityAiming(locator->getVectorDelta_awesomeState(), dT);
-	Vector next_radiusVector = radiusVector + dT * (vectorVelosityHeli + wind->getTrueVelocity(time));
-
-	radiusVector = next_radiusVector;
+	AS = std::make_unique<AimingSystem>();
 }
 
-Vector apa::Helicopter::getVectorState(const double& time)
+void apa::Helicopter::setFluctation(Vec2D mean, Mat2D cov)
 {
-	Vector vec(4);
-	vec.segment(0, 2) = radiusVector;
-	vec.segment(2, 2) = wind->getTrueVelocity(time);
-	return vec;
+	wind = std::make_unique<Wind>(std::move(mean), std::move(cov));
+}
+
+void apa::Helicopter::enableConnection(std::shared_ptr<apa::OnBoardLocatorHelicopter> loc)
+{
+	locator = loc;
+}
+
+void apa::Helicopter::move(const double time, const double dt)
+{
+	Eigen::Vector4d vector_deltaEstimatedState = locator->getMissDataFromTarget(time, dt);
+	Vec2D vectorVelocity = AS->getVectorVelocityAiming(std::move(vector_deltaEstimatedState), dt);
+	radiusVector = radiusVector + dt * (vectorVelocity + wind->getTrueVelocity(time));
+}
+
+Eigen::Vector4d apa::Helicopter::getVectorState(const double time)
+{
+	return (Eigen::Vector4d() << radiusVector, wind->getTrueVelocity(time)).finished();
 }
