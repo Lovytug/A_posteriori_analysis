@@ -7,9 +7,11 @@ namespace apa
 {
 	using Vec2D = Eigen::Vector2d;
 	using Vec4D = Eigen::Vector4d;
+	using VecND = Eigen::VectorXd;
 	using Mat2D = Eigen::Matrix2d;
 	using Mat4D = Eigen::Matrix4d;
-
+	using MatND = Eigen::MatrixXd;
+	
 	using Locator_ptr = std::shared_ptr<Locator>;
 
 	class MonitoringComplex
@@ -21,6 +23,7 @@ namespace apa
 
 		void createTarget_Ship(Vec2D position);
 		void createHunter_Helicopter(Vec2D position);
+
 		void setFluctationTarget_Ship(Vec2D mean, Mat2D cov);
 		void setFluctationHunter_Helicopter(Vec2D mean, Mat2D cov);
 
@@ -57,21 +60,21 @@ namespace apa
 		double stepSimulation;
 		std::vector<double> vectorTimes;
 
-		Eigen::VectorXd vectorState_ship;
-		Eigen::VectorXd vectorState_helicopter;
-		Eigen::VectorXd vectorDelta_trueState;
-		Eigen::VectorXd vectorDelta_awesomeState;
+		VecND vectorState_ship;
+		VecND vectorState_helicopter;
+		VecND vectorDelta_trueState;
+		VecND vectorDelta_awesomeState;
 
-		Eigen::VectorXd vectorUpperLimit_awesomeState;
-		Eigen::VectorXd vectorLowerLimit_awesomeState;
+		VecND vectorUpperLimit_awesomeState;
+		VecND vectorLowerLimit_awesomeState;
 
-		void appendToVector(Vector& vec, const Vector& newVec);
-		void appendBoundaryOfConfidenceIntervalToVector(const Matrix& matrixBorder);
-		bool checkIntersection(const Vector& vec1, const Vector& vec2);
-		std::vector<double> transformInSTLvector(const Vector& vec) const;
+		void appendToVector(VecND& vec, const Vec4D& newVec);
+		void appendBoundaryOfConfidenceIntervalToVector(const MatND& matrixBorder);
+		bool checkIntersection(const Vec4D& vec1, const Vec4D& vec2);
+		std::vector<double> transformInSTLvector(const VecND& vec) const;
 
 		template<size_t Index>
-		std::vector<double> extractComponentVector(const Vector& vec) const;
+		std::vector<double> extractComponentVector(const VecND& vec) const;
 	};
 }
 

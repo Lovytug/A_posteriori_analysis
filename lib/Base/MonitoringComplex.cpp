@@ -54,12 +54,12 @@ void apa::MonitoringComplex::startSimulation()
 	}
 }
 
-bool apa::MonitoringComplex::checkIntersection(const Vector& vec1, const Vector& vec2)
+bool apa::MonitoringComplex::checkIntersection(const Vec4D& vec1, const Vec4D& vec2)
 {
 	return (abs(vec1[0] - vec2[0]) <= 1 && abs(vec1[1] - vec2[1]) <= 1);
 }
 
-void apa::MonitoringComplex::appendToVector(Vector& vec, const Vector& newVec)
+void apa::MonitoringComplex::appendToVector(VecND& vec, const Vec4D& newVec)
 {
 	int oldSize = vec.size();
 	vec.conservativeResize(oldSize + newVec.size());
@@ -79,7 +79,7 @@ void apa::MonitoringComplex::appendBoundaryOfConfidenceIntervalToVector(const Ma
 
 
 
-std::vector<double> apa::MonitoringComplex::transformInSTLvector(const Vector& vec) const
+std::vector<double> apa::MonitoringComplex::transformInSTLvector(const VecND& vec) const
 {
 	return std::vector<double>(vec.data(), vec.data() + vec.size());
 }

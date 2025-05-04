@@ -30,12 +30,14 @@ void apa::Helicopter::enableConnection(std::shared_ptr<apa::OnBoardLocatorHelico
 
 void apa::Helicopter::move(const double time, const double dt)
 {
-	Eigen::Vector4d vector_deltaEstimatedState = locator->getMissDataFromTarget(time, dt);
-	Vec2D vectorVelocity = AS->getVectorVelocityAiming(std::move(vector_deltaEstimatedState), dt);
-	radiusVector = radiusVector + dt * (vectorVelocity + wind->getTrueVelocity(time));
+	auto vector_deltaEstimatedState = locator->getMissDataFromTarget(time, dt);
+	auto vectorVelocity = AS->getVectorVelocityAiming(std::move(vector_deltaEstimatedState), dt);
+	if(wind != nullptr) radiusVector = radiusVector + dt * (vectorVelocity + wind->getTrueVelocity(time));
+	else radiusVector = radiusVector + dt * (vectorVelocity);
 }
 
 Eigen::Vector4d apa::Helicopter::getVectorState(const double time)
 {
-	return (Eigen::Vector4d() << radiusVector, wind->getTrueVelocity(time)).finished();
+	if (wind != nullptr) return (Eigen::Vector4d() << radiusVector, wind->getTrueVelocity(time)).finished();
+	else return (Eigen::Vector4d() << radiusVector, Vec2D(0, 0)).finished();
 }

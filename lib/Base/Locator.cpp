@@ -2,9 +2,6 @@
 
 apa::SensorNoise::SensorNoise()
 {
-	vectorMean.resize(2);
-	matrixCov.resize(2, 2);
-
 	vectorMean << 0.0, 0.0;
 	matrixCov << 10.0, 0.0,
 		0.0, 10.0;

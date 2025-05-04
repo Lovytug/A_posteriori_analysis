@@ -29,5 +29,6 @@ void apa::Ship::move(const double time, const double dT)
 
 Eigen::Vector4d apa::Ship::getVectorState(const double time)
 {
-	return (Eigen::Vector4d() << radiusVector, wave->getTrueVelocity(time)).finished();
+	if (wave != nullptr) return (Eigen::Vector4d() << radiusVector, wave->getTrueVelocity(time)).finished();
+	else return (Eigen::Vector4d() << Vec2D()).finished();
 }
