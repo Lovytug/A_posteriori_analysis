@@ -11,7 +11,7 @@ namespace apa
 	{
 	public:
 		KalmanFilter(const Vector& vec, const Matrix& matrix, const double& dT);
-		void perfomFiltring(const Vector& vecMeasurement, const double& dT);
+		void perfomFiltring(Eigen::Vector2d vecMeasurement, const double& dT);
 		Vector getVectorDelta_awesomeState();
 		Matrix getMatrixDelta_awesomeMistakeState();
 		Matrix getMatrixOfConfidenceIntervalBoundsForEstimationVector();

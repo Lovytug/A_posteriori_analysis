@@ -49,7 +49,7 @@ apa::KalmanFilter::KalmanFilter(const Vector& vec_forecast, const Matrix& matrix
 			0, 1.25;
 }
 
-void apa::KalmanFilter::perfomFiltring(const Vector& vecMeas, const double& dT)
+void apa::KalmanFilter::perfomFiltring(Eigen::Vector2d vecMeas, const double& dT)
 {
 	Matrix inverse_matrixForecast = matrixDelta_forecastMistakeState.inverse();
 	Matrix H_tr = H.transpose();

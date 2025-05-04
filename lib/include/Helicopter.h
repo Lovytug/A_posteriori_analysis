@@ -29,7 +29,7 @@ namespace apa
 	public:
 		Helicopter(Vec2D vecPos);
 
-		void enableConnection(std::shared_ptr<OnBoardLocatorHelicopter> loc);
+		void enableConnection(std::shared_ptr<OnBoardLocatorHelicopter>& loc);
 
 		void setFluctation(Vec2D mean, Mat2D cov);
 

@@ -58,12 +58,22 @@ void apa::Locator::setFluctationForHunter(Vec2D mean, Mat2D cov)
 }
 
 
-apa::Vec4D apa::Locator::get_DeltaEstimatedVector_Targ_Helic(const double time, const double dt)
+apa::Vec4D apa::Locator::filtringANDget_DeltaEstimatedVector_Targ_Helic(const double time, const double dt)
 {
-	Vec4D vec_delta_noise{ get_DetltaVector_Targ_Helic(time).head(2) + noise->getSensorNoise(time)};
-	KF->perfomFiltring(std::move(vec_delta_noise), dt);
+	Vec2D vec_delta_XY_noise = get_DetltaVector_Targ_Helic(time).head<2>() + noise->getSensorNoise(time);
+	KF->perfomFiltring(std::move(vec_delta_XY_noise), dt);
 	
 	return KF->getVectorDelta_awesomeState();
+}
+
+apa::Vec4D apa::Locator::get_DeltaVectorEstimated_Targ_Helic()
+{
+	return KF->getVectorDelta_awesomeState();
+}
+
+Eigen::MatrixXd apa::Locator::getBorderOfConfidenceInterval()
+{
+	return KF->getMatrixOfConfidenceIntervalBoundsForEstimationVector();
 }
 
 apa::Vec4D apa::Locator::get_DetltaVector_Targ_Helic(const double time)

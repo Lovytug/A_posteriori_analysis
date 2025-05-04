@@ -49,16 +49,18 @@ namespace apa
 		void setFluctationForTarget(Vec2D mean, Mat2D cov);
 		void setFluctationForHunter(Vec2D mean, Mat2D cov);
 
-		Vec4D get_DeltaEstimatedVector_Targ_Helic(const double time, const double dt);
+		Vec4D filtringANDget_DeltaEstimatedVector_Targ_Helic(const double time, const double dt);
+
+		Vec4D get_DeltaVectorEstimated_Targ_Helic();
+		Eigen::MatrixXd getBorderOfConfidenceInterval();
 		Vec4D get_DetltaVector_Targ_Helic(const double time);
+		Vec4D getVectorStateTarget(const double time);
+		Vec4D getVectorStateHunter(const double time);
 
 	private:
 		Sensor_ptr noise;
 		Kalman_ptr KF;
 		OBSL_ship_ptr locShip;
 		OBSL_helic_ptr locHelic;
-
-		Vec4D getVectorStateTarget(const double time);
-		Vec4D getVectorStateHunter(const double time);
 	};
 }

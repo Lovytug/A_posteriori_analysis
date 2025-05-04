@@ -23,7 +23,7 @@ void apa::Helicopter::setFluctation(Vec2D mean, Mat2D cov)
 	wind = std::make_unique<Wind>(std::move(mean), std::move(cov));
 }
 
-void apa::Helicopter::enableConnection(std::shared_ptr<apa::OnBoardLocatorHelicopter> loc)
+void apa::Helicopter::enableConnection(std::shared_ptr<apa::OnBoardLocatorHelicopter>& loc)
 {
 	locator = loc;
 }
